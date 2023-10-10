@@ -1,7 +1,8 @@
 build:
     rm -rf build/*
-    cd build && cmake -DCMAKE_BUILD_TYPE=Debug ../src
+    cd build && cmake -DCMAKE_BUILD_TYPE=Debug ../
     cd build && make
 
 run *ARGS: build
-    ./build {{ARGS}}
+    clear
+    ./build/proj-lp {{ARGS}}
