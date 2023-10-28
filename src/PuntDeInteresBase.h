@@ -43,4 +43,30 @@ class PuntDeInteresBase {
     Coordinate getCoord();
     virtual std::string getName();
     virtual unsigned int getColor();
+
+    static std::vector<PuntDeInteresBase*> getNodeRefs(const EntryParser& parser, std::vector<std::unique_ptr<PuntDeInteresBase>>& pool) {
+        const auto children = &parser.node.fills;
+        std::vector<PuntDeInteresBase*> result;
+
+        for (auto it = children->cbegin(); it != children->cend(); it++) {
+            if (it->first == "way") {
+                for (auto jt = it->second.cbegin(); jt != it->second.cend(); jt++) {
+                    if (jt->first == "ref") {
+                        const auto key = std::stoul(jt->second);
+
+                        for (auto kt = pool.begin(); kt != pool.end(); kt++) {
+                            if ((*kt)->id == key) {
+                                result.push_back((*kt).get());
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
 };

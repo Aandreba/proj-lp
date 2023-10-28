@@ -24,25 +24,27 @@ class MapaSolucio : public MapaBase {
     }
 
     void getCamins(std::vector<CamiBase*>& dst) {
-        for (auto it = this->ips.begin(); it != this->ips.end(); it++) {
-            // (*it)->
+        dst.reserve(dst.size() + this->ways.size());
+        for (auto it = this->ways.begin(); it != this->ways.end(); it++) {
+            dst.push_back(&*it);
         }
     }
 
     void parsejaXmlElements(std::vector<XmlElement>& xmlElements) {
-        std::vector<XmlElement&> ways;
+        std::vector<XmlElement*> ways;
 
         for (auto elem = xmlElements.begin(); elem != xmlElements.end(); elem++) {
             if (elem->id_element == "node") {
                 this->parseNode(*elem);
             } else if (elem->id_element == "way") {
-                ways.push_back(*elem);
+                ways.push_back(&*elem);
             }
         }
 
         this->ways.reserve(this->ways.size() + ways.size());
         for (auto way = ways.begin(); way != ways.end(); way++) {
-            this->ways.emplace_back(*way, &this->ips);
+            const EntryParser parser(**way);
+            this->ways.emplace_back(parser, this->ips);
         }
     }
 
