@@ -4,7 +4,6 @@ double Util::m_PI = 3.141592653589793238462643383279502884L;
 double Util::m_RadiTerraX2 = static_cast<double>(2 * 6371);
 
 Util::Util() {
-
 }
 
 std::pair<std::string, std::string> Util::kvDeTag(std::vector<PAIR_ATTR_VALUE>& atributsTag) {
@@ -16,8 +15,7 @@ std::pair<std::string, std::string> Util::kvDeTag(std::vector<PAIR_ATTR_VALUE>& 
     for (const PAIR_ATTR_VALUE& atributTag : atributsTag) {
         if (atributTag.first == "k") {
             k = atributTag.second;
-        }
-        else if (atributTag.first == "v") {
+        } else if (atributTag.first == "v") {
             v = atributTag.second;
         }
     }
@@ -35,7 +33,6 @@ double Util::deg2Rad(double deg) {
 double Util::rad2Deg(double rad) {
     return rad * 180.0f / m_PI;
 }
-
 
 double Util::DistanciaHaversine(double lat1, double lon1, double lat2, double lon2) {
     lat1 = deg2Rad(lat1);

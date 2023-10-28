@@ -1,3 +1,5 @@
+all: run
+
 clean:
     rm -rf build/*
 

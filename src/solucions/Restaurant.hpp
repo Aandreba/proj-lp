@@ -2,10 +2,12 @@
 
 #include <stdint.h>
 
+#include <stdexcept>
 #include <string>
 
 #include "../Common.h"
 #include "../PuntDeInteresBase.h"
+#include "parser.hpp"
 
 class PuntDeInteresRestaurantSolucio : public PuntDeInteresBase {
    private:
@@ -16,6 +18,21 @@ class PuntDeInteresRestaurantSolucio : public PuntDeInteresBase {
     PuntDeInteresRestaurantSolucio(Coordinate coord, std::string name, std::string cuisine, bool wheelchair) : PuntDeInteresBase(coord, name) {
         this->cuisine = cuisine;
         this->wheelchair = wheelchair;
+    }
+
+    PuntDeInteresRestaurantSolucio(const NodeParser& parser) : PuntDeInteresBase(parser) {
+        auto cuisine = parser.getTag("cuisine");
+        if (cuisine == nullptr) {
+            throw new std::logic_error("some attribute was not found");
+        }
+        this->cuisine = *cuisine;
+
+        auto wheelchair = parser.getTag("wheelchair");
+        if (wheelchair == nullptr) {
+            this->wheelchair = false;
+        } else {
+            this->wheelchair = (*wheelchair) == "yes";
+        }
     }
 
     unsigned int getColor() {
