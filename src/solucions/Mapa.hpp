@@ -7,45 +7,56 @@
 #include "../MapaBase.h"
 #include "../Util.h"
 #include "Botiga.hpp"
+#include "Cami.hpp"
 #include "Restaurant.hpp"
 #include "parser.hpp"
 
 class MapaSolucio : public MapaBase {
    private:
-    std::vector<std::unique_ptr<PuntDeInteresBase>> pids;
+    std::vector<std::unique_ptr<PuntDeInteresBase>> ips;
+    std::vector<CamiSolucio> ways;
 
     void getPdis(std::vector<PuntDeInteresBase*>& dst) {
-        dst.reserve(dst.size() + this->pids.size());
-        for (auto it = this->pids.begin(); it != this->pids.end(); it++) {
+        dst.reserve(dst.size() + this->ips.size());
+        for (auto it = this->ips.begin(); it != this->ips.end(); it++) {
             dst.push_back(it->get());
         }
     }
 
     void getCamins(std::vector<CamiBase*>& dst) {
-        for (auto it = this->pids.begin(); it != this->pids.end(); it++) {
+        for (auto it = this->ips.begin(); it != this->ips.end(); it++) {
             // (*it)->
         }
     }
 
     void parsejaXmlElements(std::vector<XmlElement>& xmlElements) {
+        std::vector<XmlElement&> ways;
+
         for (auto elem = xmlElements.begin(); elem != xmlElements.end(); elem++) {
             if (elem->id_element == "node") {
                 this->parseNode(*elem);
+            } else if (elem->id_element == "way") {
+                ways.push_back(*elem);
             }
+        }
+
+        this->ways.reserve(this->ways.size() + ways.size());
+        for (auto way = ways.begin(); way != ways.end(); way++) {
+            this->ways.emplace_back(*way, &this->ips);
         }
     }
 
     void parseNode(XmlElement& node) {
-        const NodeParser parser(node);
+        const EntryParser parser(node);
 
         auto amenity = parser.getTag("amenity");
         if (amenity != nullptr && *amenity == "restaurant") {
-            this->pids.push_back(std::make_unique<PuntDeInteresRestaurantSolucio>(parser));
+            this->ips.push_back(std::make_unique<PuntDeInteresRestaurantSolucio>(parser));
         }
 
         auto shop = parser.getTag("shop");
         if (shop != nullptr) {
-            this->pids.push_back(std::make_unique<PuntDeInteresBotigaSolucio>(*shop, parser));
+            this->ips.push_back(std::make_unique<PuntDeInteresBotigaSolucio>(*shop, parser));
         }
     }
 };

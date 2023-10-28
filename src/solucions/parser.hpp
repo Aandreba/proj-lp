@@ -1,17 +1,24 @@
 #pragma once
 
 #include <iostream>
+#include <memory>
 #include <string>
+#include <vector>
 
 #include "../Common.h"
+#include "../PuntDeInteresBase.h"
 
-class NodeParser {
+class EntryParser {
    private:
     XmlElement& node;
 
    public:
-    NodeParser() = delete;
-    NodeParser(XmlElement& node) : node(node){};
+    EntryParser() = delete;
+    EntryParser(XmlElement& node) : node(node){};
+
+    const std::string& getName() const {
+        return this->node.id_element;
+    }
 
     const std::string* getAttribute(const std::string& key) const {
         const auto attrs = &this->node.atributs;
@@ -43,5 +50,31 @@ class NodeParser {
         }
 
         return nullptr;
+    }
+
+    std::vector<PuntDeInteresBase*> getNodeRefs(std::vector<std::unique_ptr<PuntDeInteresBase>>& pool) const {
+        const auto children = &this->node.fills;
+        std::vector<PuntDeInteresBase*> result;
+
+        for (auto it = children->cbegin(); it != children->cend(); it++) {
+            if (it->first == "way") {
+                for (auto jt = it->second.cbegin(); jt != it->second.cend(); jt++) {
+                    if (jt->first == "ref") {
+                        const auto key = std::stoul(jt->second);
+
+                        for (auto kt = pool.begin(); kt != pool.end(); kt++) {
+                            if ((*kt)->id == key) {
+                                result.push_back((*kt).get());
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 };

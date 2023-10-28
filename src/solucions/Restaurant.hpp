@@ -20,7 +20,7 @@ class PuntDeInteresRestaurantSolucio : public PuntDeInteresBase {
         this->wheelchair = wheelchair;
     }
 
-    PuntDeInteresRestaurantSolucio(const NodeParser& parser) : PuntDeInteresBase(parser) {
+    PuntDeInteresRestaurantSolucio(const EntryParser& parser) : PuntDeInteresBase(parser) {
         auto cuisine = parser.getTag("cuisine");
         if (cuisine != nullptr) {
             this->cuisine = *cuisine;

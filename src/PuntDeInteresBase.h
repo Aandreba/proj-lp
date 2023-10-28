@@ -7,6 +7,9 @@
 #include "solucions/parser.hpp"
 
 class PuntDeInteresBase {
+   public:
+    unsigned long id;
+
    private:
     Coordinate m_coord;
     std::string m_name;
@@ -14,10 +17,15 @@ class PuntDeInteresBase {
    public:
     PuntDeInteresBase();
     PuntDeInteresBase(Coordinate coord, std::string name);
-    PuntDeInteresBase(const NodeParser& parser) {
+    PuntDeInteresBase(const EntryParser& parser) {
+        auto id = parser.getAttribute("id");
         auto name = parser.getTag("name");
         auto lat = parser.getAttribute("lat");
         auto lon = parser.getAttribute("lon");
+
+        if (id != nullptr) {
+            this->id = std::stoul(*id);
+        }
 
         if (name != nullptr) {
             this->m_name = *name;

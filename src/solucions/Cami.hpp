@@ -1,18 +1,24 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include "../CamiBase.h"
 #include "../Common.h"
+#include "../PuntDeInteresBase.h"
+#include "parser.hpp"
 
 class CamiSolucio : public CamiBase {
    public:
-    std::vector<Coordinate> getCamiCoords() {
-        return {
-            {41.4928803, 2.1452381},
-            {41.4929072, 2.1452474},
-            {41.4933070, 2.1453852},
-            {41.4939882, 2.1456419},
-        };
+    std::string highway;
+    std::vector<PuntDeInteresBase*> nodes;
+
+   public:
+    CamiSolucio(const EntryParser& parser, std::vector<std::unique_ptr<PuntDeInteresBase>>& node_pool) {
+        auto highway = parser.getTag("highway");
+        if (highway != nullptr) {
+            this->highway = *highway;
+        }
+        this->nodes = parser.getNodeRefs(node_pool);
     }
 };
