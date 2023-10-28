@@ -22,10 +22,9 @@ class PuntDeInteresRestaurantSolucio : public PuntDeInteresBase {
 
     PuntDeInteresRestaurantSolucio(const NodeParser& parser) : PuntDeInteresBase(parser) {
         auto cuisine = parser.getTag("cuisine");
-        if (cuisine == nullptr) {
-            throw new std::logic_error("some attribute was not found");
+        if (cuisine != nullptr) {
+            this->cuisine = *cuisine;
         }
-        this->cuisine = *cuisine;
 
         auto wheelchair = parser.getTag("wheelchair");
         if (wheelchair == nullptr) {

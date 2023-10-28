@@ -19,13 +19,17 @@ class PuntDeInteresBase {
         auto lat = parser.getAttribute("lat");
         auto lon = parser.getAttribute("lon");
 
-        if (name == nullptr || lat == nullptr || lon == nullptr) {
-            throw new std::logic_error("some attribute was not found");
+        if (name != nullptr) {
+            this->m_name = *name;
         }
 
-        this->m_name = *name;
-        this->m_coord.lat = std::stod(*lat);
-        this->m_coord.lon = std::stod(*lon);
+        if (lat != nullptr) {
+            this->m_coord.lat = std::stod(*lat);
+        }
+
+        if (lon != nullptr) {
+            this->m_coord.lat = std::stod(*lon);
+        }
     }
 
     Coordinate getCoord();

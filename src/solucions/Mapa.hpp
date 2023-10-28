@@ -38,12 +38,12 @@ class MapaSolucio : public MapaBase {
     void parseNode(XmlElement& node) {
         const NodeParser parser(node);
 
-        auto amenity = parser.getAttribute("amenity");
+        auto amenity = parser.getTag("amenity");
         if (amenity != nullptr && *amenity == "restaurant") {
             this->pids.push_back(std::make_unique<PuntDeInteresRestaurantSolucio>(parser));
         }
 
-        auto shop = parser.getAttribute("shop");
+        auto shop = parser.getTag("shop");
         if (shop != nullptr) {
             this->pids.push_back(std::make_unique<PuntDeInteresBotigaSolucio>(*shop, parser));
         }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <string>
 
 #include "../Common.h"
@@ -24,19 +25,23 @@ class NodeParser {
 
     const std::string* getTag(const std::string& k) const {
         const auto children = &this->node.fills;
+
         for (auto it = children->cbegin(); it != children->cend(); it++) {
             if (it->first == "tag") {
                 bool correctKey = false;
-                std::string* value = nullptr;
+                const std::string* value = nullptr;
 
-                for (auto jt = it->second.begin(); jt != it->second.end(); jt++) {
-                    if (correctKey && jt->first == "v") {
-                        return &jt->second;
-                    }
+                for (auto jt = it->second.cbegin(); jt != it->second.cend(); jt++) {
                     correctKey |= jt->first == "k" && jt->second == k;
+                    if (jt->first == "v") {
+                        value = &jt->second;
+                    }
+
+                    if (correctKey && value != nullptr) return value;
                 }
             }
         }
+
         return nullptr;
     }
 };

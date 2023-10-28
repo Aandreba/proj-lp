@@ -47,6 +47,14 @@
     "typeinfo": "cpp",
     "any": "cpp",
     "optional": "cpp",
-    "fstream": "cpp"
+    "fstream": "cpp",
+    "list": "cpp",
+    "unordered_set": "cpp",
+    "cstring": "cpp",
+    "ctime": "cpp",
+    "map": "cpp",
+    "set": "cpp",
+    "iomanip": "cpp",
+    "sstream": "cpp"
   }
 }
