@@ -26,7 +26,7 @@ class PuntDeInteresBotigaSolucio : public PuntDeInteresBase {
         }
     };
 
-    unsigned int getColor() const {
+    unsigned int getColor() {
         if (this->shop == "supermarket") {
             return 0xA5BE00;
         } else if (this->shop == "tobacco") {
