@@ -20,12 +20,7 @@ class PuntDeInteresRestaurantSolucio : public PuntDeInteresBase {
         this->wheelchair = wheelchair;
     }
 
-    PuntDeInteresRestaurantSolucio(const EntryParser& parser) : PuntDeInteresBase(parser) {
-        auto cuisine = parser.getTag("cuisine");
-        if (cuisine != nullptr) {
-            this->cuisine = *cuisine;
-        }
-
+    PuntDeInteresRestaurantSolucio(std::string cuisine, const EntryParser& parser) : PuntDeInteresBase(parser), cuisine(cuisine) {
         auto wheelchair = parser.getTag("wheelchair");
         if (wheelchair == nullptr) {
             this->wheelchair = false;

@@ -51,9 +51,9 @@ class MapaSolucio : public MapaBase {
     void parseNode(XmlElement& node) {
         const EntryParser parser(node);
 
-        auto amenity = parser.getTag("amenity");
-        if (amenity != nullptr && *amenity == "restaurant") {
-            this->ips.push_back(std::make_unique<PuntDeInteresRestaurantSolucio>(parser));
+        auto cuisine = parser.getTag("cuisine");
+        if (cuisine != nullptr) {
+            this->ips.push_back(std::make_unique<PuntDeInteresRestaurantSolucio>(*cuisine, parser));
         }
 
         auto shop = parser.getTag("shop");
