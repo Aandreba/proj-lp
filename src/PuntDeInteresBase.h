@@ -36,7 +36,7 @@ class PuntDeInteresBase {
         }
 
         if (lon != nullptr) {
-            this->m_coord.lat = std::stod(*lon);
+            this->m_coord.lon = std::stod(*lon);
         }
     }
 
