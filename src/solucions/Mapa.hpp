@@ -9,6 +9,7 @@
 #include "Botiga.hpp"
 #include "Cami.hpp"
 #include "Restaurant.hpp"
+#include "binary_map.hpp"
 #include "parser.hpp"
 
 class MapaSolucio : public MapaBase {
@@ -32,10 +33,12 @@ class MapaSolucio : public MapaBase {
 
     void parsejaXmlElements(std::vector<XmlElement>& xmlElements) {
         std::vector<XmlElement*> ways;
+        binary_map<unsigned long, Coordinate> nodes;
 
         for (auto elem = xmlElements.begin(); elem != xmlElements.end(); elem++) {
             if (elem->id_element == "node") {
-                this->parseNode(*elem);
+                const auto info = this->parseNode(*elem);
+                nodes.insert(std::move(info.first), std::move(info.second));
             } else if (elem->id_element == "way") {
                 ways.push_back(&*elem);
             }
@@ -44,21 +47,30 @@ class MapaSolucio : public MapaBase {
         this->ways.reserve(this->ways.size() + ways.size());
         for (auto way = ways.begin(); way != ways.end(); way++) {
             const EntryParser parser(**way);
-            this->ways.emplace_back(parser, this->ips);
+            this->ways.emplace_back(parser, nodes);
         }
     }
 
-    void parseNode(XmlElement& node) {
+    std::pair<unsigned long, Coordinate> parseNode(XmlElement& node) {
         const EntryParser parser(node);
 
         auto cuisine = parser.getTag("cuisine");
         if (cuisine != nullptr) {
-            this->ips.push_back(std::make_unique<PuntDeInteresRestaurantSolucio>(*cuisine, parser));
+            auto rest = std::make_unique<PuntDeInteresRestaurantSolucio>(*cuisine, parser);
+            const auto info = std::make_pair(rest->id, rest->getCoord());
+            this->ips.push_back(std::move(rest));
+            return info;
         }
 
         auto shop = parser.getTag("shop");
         if (shop != nullptr) {
-            this->ips.push_back(std::make_unique<PuntDeInteresBotigaSolucio>(*shop, parser));
+            auto shop_ptr = std::make_unique<PuntDeInteresBotigaSolucio>(*shop, parser);
+            const auto info = std::make_pair(shop_ptr->id, shop_ptr->getCoord());
+            this->ips.push_back(std::move(shop_ptr));
+            return info;
         }
+
+        PuntDeInteresBase generic(parser);
+        return std::make_pair(generic.id, generic.getCoord());
     }
 };

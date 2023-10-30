@@ -4,6 +4,7 @@
 #include <string>
 
 #include "Common.h"
+#include "solucions/binary_map.hpp"
 #include "solucions/parser.hpp"
 
 class PuntDeInteresBase {
@@ -44,21 +45,19 @@ class PuntDeInteresBase {
     virtual std::string getName();
     virtual unsigned int getColor();
 
-    static std::vector<PuntDeInteresBase*> getNodeRefs(const EntryParser& parser, std::vector<std::unique_ptr<PuntDeInteresBase>>& pool) {
+    static std::vector<Coordinate> getNodeCoords(const EntryParser& parser, const binary_map<unsigned long, Coordinate>& pool) {
         const auto children = &parser.node.fills;
-        std::vector<PuntDeInteresBase*> result;
+        std::vector<Coordinate> result;
 
         for (auto it = children->cbegin(); it != children->cend(); it++) {
-            if (it->first == "way") {
+            if (it->first == "nd") {
                 for (auto jt = it->second.cbegin(); jt != it->second.cend(); jt++) {
                     if (jt->first == "ref") {
                         const auto key = std::stoul(jt->second);
 
-                        for (auto kt = pool.begin(); kt != pool.end(); kt++) {
-                            if ((*kt)->id == key) {
-                                result.push_back((*kt).get());
-                                break;
-                            }
+                        try {
+                            result.push_back(pool.at(key));
+                        } catch (const std::out_of_range&) {
                         }
 
                         break;
