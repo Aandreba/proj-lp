@@ -755,7 +755,8 @@ double quartTest1(MapaBase* mapaBase) {
             grade += 1;
         }
 
-        else if (pdi->getName() == "UnaBakeryAmbMobRedOberta" && pdi->getColor() == 0x4CB944) {
+        else if (pdi->getName() == "UnaBakeryAmbMobRedOberta" &&
+                 pdi->getColor() == 0x4CB944) {
             if (mostraDetalls)
                 std::cout << "Comment :=>> ESTUDIANT HA TROBAT UNABAKERY PER MOB. REDUIDA OBERTA" << std::endl;
             grade += 2;

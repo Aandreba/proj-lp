@@ -32,7 +32,7 @@ class PuntDeInteresBotigaSolucio : public PuntDeInteresBase {
         } else if (this->shop == "tobacco") {
             return 0xFFAD69;
         } else if (this->shop == "bakery") {
-            if (string_contains(this->opening_hours, "Div 06:00-22:00") || string_contains(this->opening_hours, "Dill 06:00-22:00")) {
+            if (string_contains(this->opening_hours, "Tots els dies a 06:00-22:00") || string_contains(this->opening_hours, "Div 06:00-22:00") || string_contains(this->opening_hours, "Dill 06:00-22:00")) {
                 return 0x4CB944;
             } else {
                 return 0xE85D75;
