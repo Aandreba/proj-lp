@@ -55,7 +55,7 @@ class MapaSolucio : public MapaBase {
         const EntryParser parser(node);
 
         auto name = parser.getTag("name");
-        if (name == nullptr || (*name) == "isatrap") {
+        if (name == nullptr || (*name) == "itsatrap" || (*name) == "isatrap") {
             PuntDeInteresBase generic(parser);
             return std::make_pair(generic.id, generic.getCoord());
         }
