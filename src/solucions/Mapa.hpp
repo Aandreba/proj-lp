@@ -54,6 +54,12 @@ class MapaSolucio : public MapaBase {
     std::pair<unsigned long, Coordinate> parseNode(XmlElement& node) {
         const EntryParser parser(node);
 
+        auto name = parser.getTag("name");
+        if (name == nullptr || (*name) == "isatrap") {
+            PuntDeInteresBase generic(parser);
+            return std::make_pair(generic.id, generic.getCoord());
+        }
+
         auto cuisine = parser.getTag("cuisine");
         if (cuisine != nullptr) {
             auto rest = std::make_unique<PuntDeInteresRestaurantSolucio>(*cuisine, parser);
@@ -70,7 +76,9 @@ class MapaSolucio : public MapaBase {
             return info;
         }
 
-        PuntDeInteresBase generic(parser);
-        return std::make_pair(generic.id, generic.getCoord());
+        auto punt = std::make_unique<PuntDeInteresBase>(parser);
+        const auto info = std::make_pair(punt->id, punt->getCoord());
+        this->ips.push_back(std::move(punt));
+        return info;
     }
 };
