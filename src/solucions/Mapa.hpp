@@ -35,6 +35,7 @@ class MapaSolucio : public MapaBase {
         std::vector<XmlElement*> ways;
         binary_map<unsigned long, Coordinate> nodes;
 
+        this->clear();
         for (auto elem = xmlElements.begin(); elem != xmlElements.end(); elem++) {
             if (elem->id_element == "node") {
                 const auto info = this->parseNode(*elem);
@@ -80,5 +81,10 @@ class MapaSolucio : public MapaBase {
         const auto info = std::make_pair(punt->id, punt->getCoord());
         this->ips.push_back(std::move(punt));
         return info;
+    }
+
+    void clear() {
+        this->ips.clear();
+        this->ways.clear();
     }
 };
