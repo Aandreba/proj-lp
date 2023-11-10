@@ -4,8 +4,8 @@
 #include <list>
 #include <map>
 
-#include "./Mapa.hpp"
 #include "MapaBase.h"
+#include "MapaSolucio.h"
 #include "XML4OSMUtilModificat.h"
 
 // POSA A 'true' PER VEURE ELS DETALLS DEL TESTS

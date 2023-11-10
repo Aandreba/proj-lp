@@ -16,6 +16,40 @@ class EntryParser {
     EntryParser() = delete;
     EntryParser(XmlElement& node) : node(node){};
 
+    PuntDeInteresBase parseBase() const {
+        auto name = this->getTag("name");
+        auto lat = this->getAttribute("lat");
+        auto lon = this->getAttribute("lon");
+
+        std::string m_name = "";
+        Coordinate m_coord = {0.0, 0.0};
+
+        if (name != nullptr) {
+            m_name = *name;
+        }
+
+        if (lat != nullptr) {
+            m_coord.lat = std::stod(*lat);
+        }
+
+        if (lon != nullptr) {
+            m_coord.lon = std::stod(*lon);
+        }
+
+        return PuntDeInteresBase(m_coord, m_name);
+    }
+
+    unsigned long getId() const {
+        unsigned long id_res = 0;
+
+        auto id = this->getAttribute("id");
+        if (id != nullptr) {
+            id_res = std::stoul(*id);
+        }
+
+        return id_res;
+    }
+
     const std::string& getName() const {
         return this->node.id_element;
     }

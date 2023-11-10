@@ -31,7 +31,3 @@ typedef struct {
     std::vector<PAIR_ATTR_VALUE> atributs;
     std::vector<CHILD_NODE> fills;
 } XmlElement;
-
-inline bool string_contains(const std::string& haystack, const std::string& needle) {
-    return haystack.find(needle) != std::string::npos;
-}

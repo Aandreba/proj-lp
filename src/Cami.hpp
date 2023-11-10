@@ -6,6 +6,7 @@
 #include "./CamiBase.h"
 #include "./Common.h"
 #include "./PuntDeInteresBase.h"
+#include "MyUtils.hpp"
 #include "parser.hpp"
 
 class CamiSolucio : public CamiBase {
@@ -19,7 +20,7 @@ class CamiSolucio : public CamiBase {
         if (highway != nullptr) {
             this->highway = *highway;
         }
-        this->coords = PuntDeInteresBase::getNodeCoords(parser, node_pool);
+        this->coords = getNodeCoords(parser, node_pool);
     }
 
     std::vector<Coordinate> getCamiCoords() {

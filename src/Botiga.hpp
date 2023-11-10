@@ -6,6 +6,7 @@
 
 #include "./Common.h"
 #include "./PuntDeInteresBase.h"
+#include "MyUtils.hpp"
 #include "parser.hpp"
 
 class PuntDeInteresBotigaSolucio : public PuntDeInteresBase {
@@ -19,7 +20,7 @@ class PuntDeInteresBotigaSolucio : public PuntDeInteresBase {
         this->shop = shop;
     }
 
-    PuntDeInteresBotigaSolucio(const std::string& shop, const EntryParser& parser) : PuntDeInteresBase(parser), shop(shop) {
+    PuntDeInteresBotigaSolucio(const std::string& shop, const EntryParser& parser) : PuntDeInteresBase(parser.parseBase()), shop(shop) {
         auto opening_hours = parser.getTag("opening_hours");
         if (opening_hours != nullptr) {
             this->opening_hours = *opening_hours;
