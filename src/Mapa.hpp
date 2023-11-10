@@ -4,8 +4,8 @@
 #include <utility>
 #include <vector>
 
-#include "../MapaBase.h"
-#include "../Util.h"
+#include "./MapaBase.h"
+#include "./Util.h"
 #include "Botiga.hpp"
 #include "Cami.hpp"
 #include "Restaurant.hpp"

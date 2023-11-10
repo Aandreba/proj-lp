@@ -3,9 +3,9 @@
 #include <stdexcept>
 #include <string>
 
+#include "./binary_map.hpp"
+#include "./parser.hpp"
 #include "Common.h"
-#include "solucions/binary_map.hpp"
-#include "solucions/parser.hpp"
 
 class PuntDeInteresBase {
    public:

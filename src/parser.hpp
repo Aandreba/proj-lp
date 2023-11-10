@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-#include "../Common.h"
-#include "../PuntDeInteresBase.h"
+#include "./Common.h"
+#include "./PuntDeInteresBase.h"
 
 class EntryParser {
    public:

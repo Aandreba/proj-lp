@@ -4,8 +4,8 @@
 
 #include <string>
 
-#include "../Common.h"
-#include "../PuntDeInteresBase.h"
+#include "./Common.h"
+#include "./PuntDeInteresBase.h"
 #include "parser.hpp"
 
 class PuntDeInteresBotigaSolucio : public PuntDeInteresBase {

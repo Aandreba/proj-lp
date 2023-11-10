@@ -4,9 +4,9 @@
 #include <list>
 #include <map>
 
+#include "./Mapa.hpp"
 #include "MapaBase.h"
 #include "XML4OSMUtilModificat.h"
-#include "solucions/Mapa.hpp"
 
 // POSA A 'true' PER VEURE ELS DETALLS DEL TESTS
 // POSA A 'false' PER VEURE DIRECTAMENT NUMERO ESTUDIANTS I NOTA

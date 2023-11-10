@@ -3,9 +3,9 @@
 #include <memory>
 #include <vector>
 
-#include "../CamiBase.h"
-#include "../Common.h"
-#include "../PuntDeInteresBase.h"
+#include "./CamiBase.h"
+#include "./Common.h"
+#include "./PuntDeInteresBase.h"
 #include "parser.hpp"
 
 class CamiSolucio : public CamiBase {
