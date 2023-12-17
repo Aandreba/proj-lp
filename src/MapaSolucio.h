@@ -88,4 +88,6 @@ class MapaSolucio : public MapaBase {
         this->ips.clear();
         this->ways.clear();
     }
+
+    CamiBase * buscaCamiMesCurt(PuntDeInteresBase *desde, PuntDeInteresBase *a) override { return nullptr; }
 };

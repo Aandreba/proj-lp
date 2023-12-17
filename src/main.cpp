@@ -1,785 +1,470 @@
 #include <algorithm>
-#include <iomanip>
 #include <iostream>
-#include <list>
 #include <map>
+#include <iomanip>
 
-#include "MapaBase.h"
-#include "MapaSolucio.h"
 #include "XML4OSMUtilModificat.h"
+#include "MapaBase.h"
+#include "AvaluadorBallTree.h"
+#include "MapaSolucio.h"
 
 // POSA A 'true' PER VEURE ELS DETALLS DEL TESTS
 // POSA A 'false' PER VEURE DIRECTAMENT NUMERO ESTUDIANTS I NOTA
 bool mostraDetalls = true;
 
-double primerTest1(MapaBase* mapaBase);
-double primerTest2(MapaBase* mapaBase);
-double primerTest3(MapaBase* mapaBase);
+// Comprova que el inOrdre, preOrdre i postOrdre estiguin per tamanys
+// i coordenades de cadascu pel primer conjunt de dades.
+double primerTestTasca2(); // 10/10. Maxima puntuacio a obtenir: 10 (3.5 + 3.5 + 3)
 
-double segonTest1(MapaBase* mapaBase);
-double segonTest2(MapaBase* mapaBase);
+// Comprova que la coordenada del punt de interes especificat correspongui al node-cami
+// assignat, per cinc punts de interes diferents pel tercer conjunt de dades.
+double primerTestTasca3(); // 10/10. Maxima puntuacio a obtenir: 10 (2 per cada)
 
-double tercerTest1(MapaBase* mapaBase);
-double tercerTest2(MapaBase* mapaBase);
-
-double quartTest1(MapaBase* mapaBase);
-
-void printNotaAcumulat10(std::string id_test, double grade, int expected) {
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> ---------------------------------------------" << std::endl;
-        std::cout << "Comment :=>> GRADE PER " << id_test << " ACUMULAT " << grade << " SOBRE " << expected << std::endl;
-        std::cout << "Comment :=>> ---------------------------------------------" << std::endl;
-    }
-}
+// Comprova que el cami entre dos punts de interes especificats es correcte,
+// per dues parelles diferents pel primer conjunt de dades.
+double primerTestTasca4(MapaBase* mapaBase);
 
 int main() {
-    double grade1 = 0.0;
-    double grade2 = 0.0;
-    double grade3 = 0.0;
-    double grade4 = 0.0;
-    double grade = 0.0;
+  double grade1 = 0.0;
+  double grade2 = 0.0;
+  double grade3 = 0.0;
 
-    std::vector<XmlElement> vectorElements = {};
-    XML4OSMUtilModificat xml4OsmModificat;
+  double grade = 0.0;
 
-    // TODO: Assignar memoria per mapaSolucio amb la classe MapaSolucio definida
-    MapaBase* mapaSolucio = new MapaSolucio();
+  std::vector<XmlElement> vectorElements = {};
+  XML4OSMUtilModificat xml4OsmModificat;
 
-    if (mapaSolucio == nullptr) {
-        std::cout << "Comment :=>> No s'ha instanciat correctament mapaSolucio" << std::endl;
-        std::cout << "Comment :=>> No es pot procedir en l'execucio dels tests" << std::endl;
-        return -1;
-    }
+  // TODO: Assignar memoria per mapaSolucio amb la classe MapaSolucio definida
+  MapaBase* mapaSolucio = new MapaSolucio();
 
-    xml4OsmModificat.retornaConjuntTest1(vectorElements);
+  if (mapaSolucio == nullptr) {
+    std::cout << "Comment :=>> No s'ha instanciat correctament mapaSolucio" << std::endl;
+    std::cout << "Comment :=>> No es pot procedir en l'execucio dels tests" << std::endl;
+    return -1;
+  }
 
-    mapaSolucio->parsejaXmlElements(vectorElements);
-    grade1 += primerTest1(mapaSolucio);
-    printNotaAcumulat10("PRIMERTEST1[0]", grade1, 4);
 
-    grade1 += primerTest2(mapaSolucio);
-    printNotaAcumulat10("PRIMERTEST1[1]", grade1, 8);
+  grade1 = primerTestTasca2();
+  grade2 = primerTestTasca3();
 
-    grade1 += primerTest3(mapaSolucio);
-    printNotaAcumulat10("PRIMERTEST1[2]", grade1, 10);
+  xml4OsmModificat.retornaConjuntTest1(vectorElements);
+  mapaSolucio->parsejaXmlElements(vectorElements);
 
-    vectorElements.clear();
-    xml4OsmModificat.retornaConjuntTest2(vectorElements);
+  grade3 = primerTestTasca4(mapaSolucio);
 
-    mapaSolucio->parsejaXmlElements(vectorElements);
-    grade2 += segonTest1(mapaSolucio);
-    printNotaAcumulat10("SEGONTEST1[0]", grade2, 8);
+  grade = (grade1 + grade2 + grade3) / 3;
 
-    grade2 += segonTest2(mapaSolucio);
-    printNotaAcumulat10("SEGONTEST1[1]", grade2, 10);
+  if (mostraDetalls) {
+    std::cout << std::endl << std::endl;
 
-    vectorElements.clear();
-    xml4OsmModificat.retornaConjuntTest3(vectorElements);
+    std::cout << "Comment :=>> Nota Grade1 [recorregut Balltree]: " << grade1 << std::endl;
+    std::cout << "Comment :=>> Nota Grade2 [Node mes proper]: " << grade2 << std::endl;
+    std::cout << "Comment :=>> Nota Grade3 [Cami mes curt]: " << grade3 << std::endl;
+  }
 
-    mapaSolucio->parsejaXmlElements(vectorElements);
-    grade3 += tercerTest1(mapaSolucio);
-    printNotaAcumulat10("TERCERTEST1[0]", grade3, 5);
+  if (mostraDetalls) {
+    std::cout << "Comment :=>> Nota segona part Projecte: " << grade << std::endl;
+  }
 
-    grade3 += tercerTest2(mapaSolucio);
-    printNotaAcumulat10("TERCERTEST1[1]", grade3, 10);
+  std::cout << "Grade :=>> " << grade << std::endl;
 
-    vectorElements.clear();
-    xml4OsmModificat.retornaConjuntTest4(vectorElements);
-
-    mapaSolucio->parsejaXmlElements(vectorElements);
-    grade4 += quartTest1(mapaSolucio);
-    printNotaAcumulat10("QUARTTEST[1]", grade3, 10);
-
-    grade = 0.1 * grade1 + 0.6 * grade2 + 0.15 * grade3 + 0.15 * grade4;
-
-    if (mostraDetalls) {
-        std::cout << std::endl
-                  << std::endl;
-
-        double perGrade1 = 0.1;
-        double perGrade2 = 0.6;
-        double perGrade3 = 0.15;
-        double perGrade4 = 0.15;
-
-        printf("Comment :=>> Nota desglossada (percentatge * nota): %.2f * %.2f + %.2f * %.2f + %.2f * %.2f + %.2f * %.2f \n", perGrade1, grade1, perGrade2, grade2, perGrade3, grade3, perGrade4, grade4);
-    }
-
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> Nota Primera Part Projecte: ";
-    }
-
-    std::cout << grade << std::endl;
-
-    std::cout << "Grade :=>> " << grade << std::endl;
-
-    return 0;
+  return 0;
 }
 
-double primerTest1(MapaBase* mapaBase) {
-    double grade = 0;
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> -------------" << std::endl;
-        std::cout << "Comment :=>> Primer Test 1" << std::endl;
-        std::cout << "Comment :=>> -------------" << std::endl;
-        std::cout << "Comment :=>> Provem que tenim dos camins i quatre punts de interes en el primer conjunt de dades" << std::endl;
-        std::cout << "Comment :=>> -------------" << std::endl;
+
+bool checkRecorreguts(const std::vector<std::list<Coordinate>>& result, const std::vector<int>& recorregut, std::vector<int>& estudiant) {
+  int i = 0;
+  estudiant.clear();
+  bool check = true;
+  for (auto list_coord : result) {
+    if (i < recorregut.size()) {
+      if (i != std::distance(list_coord.begin(), list_coord.end())) {
+        check = false;
+      }
+    }
+    else {
+      check = false;
     }
 
-    std::vector<PuntDeInteresBase*> vecPdis = {};
-    std::vector<CamiBase*> vecCamins = {};
+    estudiant.push_back(std::distance(list_coord.begin(), list_coord.end()));
+  }
 
-    mapaBase->getPdis(vecPdis);
-    mapaBase->getCamins(vecCamins);
-
-    if (vecCamins.size() == 2) {
-        grade += 2.0;
-    }
-
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> NUMERO DE CAMINS: " << 2 << std::endl;
-        std::cout << "Comment :=>> NUMERO DE CAMINS ESTUDIANT: " << vecCamins.size() << std::endl;
-        std::cout << "Comment :=>> PRIMERTEST1[0] : " << ((vecCamins.size() == 2) ? "CORRECTE" : "ERRONI") << std::endl;
-    }
-
-    if (vecPdis.size() == 4) {
-        grade += 2.0;
-    }
-
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> NUMERO DE PUNTS DE INTERES: " << 4 << std::endl;
-        std::cout << "Comment :=>> NUMERO DE PUNTS DE INTERES ESTUDIANT: " << vecPdis.size() << std::endl;
-        std::cout << "Comment :=>> PRIMERTEST1[1] : " << ((vecPdis.size() == 4) ? "CORRECTE" : "ERRONI") << std::endl;
-
-        std::cout << "Comment :=>> ====================" << std::endl;
-        std::cout << "Comment :=>> FI PRIMER TEST  1" << std::endl;
-        std::cout << "Comment :=>> PRIMERTEST1 GRADE1 : " << grade << " / 4" << std::endl;
-        std::cout << "Comment :=>> ====================" << std::endl;
-    }
-
-    return grade;
+  return check;
 }
 
-double primerTest2(MapaBase* mapaBase) {
-    double grade = 0;
 
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> -------------" << std::endl;
-        std::cout << "Comment :=>> Primer Test 2" << std::endl;
-        std::cout << "Comment :=>> -------------" << std::endl;
-        std::cout << "Comment :=>> Provem que tenim un unic shop amb acces per persones amb mobilitat reduida amb color 0xE85D75 a coordenades especifiques." << std::endl;
-        std::cout << "Comment :=>> Provem que tenim un Cafe Gaucho amb color el per defecte." << std::endl;
-        std::cout << "Comment :=>> -------------" << std::endl;
+bool checkRecorreguts(const std::vector<std::list<Coordinate>>& recorregut, const std::vector<std::list<Coordinate>>& expected) {
+  double epsilon = 0.0001;
+  if (recorregut.size() != expected.size())
+    return false;
+
+  int i = 0;
+  bool check = true;
+
+  for (auto list_coord : expected) {
+    int distanciaListRecorregut = std::distance(recorregut[i].begin(), recorregut[i].end());
+    int distanciaListExpected = std::distance(expected[i].begin(), expected[i].end());
+
+    if (distanciaListRecorregut != distanciaListExpected) {
+      check = false;
     }
+    else {
+      auto it_recorregut = recorregut[i].begin();
+      auto it_expected = expected[i].begin();
 
-    PuntDeInteresBase colorDefecte;
-
-    std::vector<PuntDeInteresBase*> vecPdis = {};
-
-    mapaBase->getPdis(vecPdis);
-    int counter = 0;
-    int countUnicShop = 0;
-    int countUnicGaucho = 0;
-    int colorCafeGaucho = 0x0;
-
-    for (PuntDeInteresBase* pdi : vecPdis) {
-        bool isLatRight = pdi->getCoord().lat >= 41.4927378 && pdi->getCoord().lat <= 41.4927381;
-        bool isLonRight = pdi->getCoord().lon >= 2.145420 && pdi->getCoord().lon <= 2.1454210;
-        if (isLatRight && isLonRight) {
-            if (pdi->getColor() == 0xE85D75) {
-                grade += 2.0;
-                countUnicShop++;
-            }
-        } else if (pdi->getName() == "Cafe gaucho") {
-            colorCafeGaucho = pdi->getColor();
-
-            if (pdi->getColor() == colorDefecte.getColor()) {
-                grade += 1.0;
-                countUnicGaucho++;
-            }
-        } else {
-            if (pdi->getColor() == colorDefecte.getColor()) {
-                counter++;
-            }
+      while (it_expected != expected[i].end()) {
+        if (Util::DistanciaHaversine(*(it_expected), *(it_recorregut)) > epsilon) {
+          check = false;
         }
+
+        it_expected++;
+        it_recorregut++;
+      }
     }
 
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> NUMERO DE CAFE GAUCHO: " << 1 << std::endl;
-        std::cout << "Comment :=>> NUMERO DE CAFE GAUCHO ESTUDIANT: " << countUnicGaucho << std::endl;
-        std::cout << "Comment :=>> PRIMERTEST2[0] : " << ((countUnicGaucho == 1) ? "CORRECTE" : "ERRONI") << std::endl;
+    i++;
+  }
 
-        std::cout << "Comment :=>> NUMERO DE BOTIGA A COORDENADES ESPECIFIQUES: " << 1 << std::endl;
-        std::cout << "Comment :=>> NUMERO DE BOTIGA A COORDENADES ESPECIFIQUES ESTUDIANT: " << countUnicShop << std::endl;
-        std::cout << "Comment :=>> PRIMERTEST2[1] : " << ((countUnicShop == 1) ? "CORRECTE" : "ERRONI") << std::endl;
 
-        std::cout << "Comment :=>> COLOR CAFE GAUCHO: 0xFFA500" << std::endl;
-        std::cout << "Comment :=>> COLOR CAFE GAUCHO ESTUDIANT: " << std::hex << std::uppercase << colorCafeGaucho << std::endl;
-        std::cout << "Comment :=>> PRIMERTEST2[2] : " << ((colorCafeGaucho == 0xFFA500) ? "CORRECTE" : "ERRONI") << std::endl;
-    }
-
-    grade += (counter == 1) ? 1.0 : 0.0;
-
-    // Existeixen mes d'un punt que apunten al mateix lloc, o no s'han trobat.
-    // Avaluem com a 0 aquesta part.
-    grade = (countUnicShop != 1 && countUnicGaucho != 1) ? 0.0 : grade;
-
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> ====================" << std::endl;
-        std::cout << "Comment :=>> FI PRIMER TEST  2" << std::endl;
-        std::cout << "Comment :=>> PRIMERTEST2 GRADE 1: " << grade << " / 4" << std::endl;
-        std::cout << "Comment :=>> ====================" << std::endl;
-    }
-
-    return grade;
+  return check;
 }
 
-double primerTest3(MapaBase* mapaBase) {
-    double grade = 0;
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> -------------" << std::endl;
-        std::cout << "Comment :=>> Primer Test 3" << std::endl;
-        std::cout << "Comment :=>> -------------" << std::endl;
-        std::cout << "Comment :=>> Provem que tenim dos camins amb numero de coordenades especifiques pel primer conjunt de dades." << std::endl;
-        std::cout << "Comment :=>> -------------" << std::endl;
-    }
-
-    std::vector<CamiBase*> vecCamins = {};
-
-    std::vector<Coordinate> resultCami1 = {
-        Coordinate{std::stod("41.4887861"), std::stod("2.1417598")},  // 361239083
-        Coordinate{std::stod("41.4888072"), std::stod("2.1418469")},  // 5108437668
-        Coordinate{std::stod("41.4888606"), std::stod("2.1420670")},  // 5108437663
-        Coordinate{std::stod("41.4893752"), std::stod("2.1425048")},  // 6783176578
-        Coordinate{std::stod("41.4894257"), std::stod("2.1425477")},  // 360927044
-        Coordinate{std::stod("41.4894730"), std::stod("2.1425895")},  // 6783176580
-        Coordinate{std::stod("41.4898995"), std::stod("2.1429666")},  // 5108501276
-        Coordinate{std::stod("41.4899716"), std::stod("2.1430302")},  // 361239079
-        Coordinate{std::stod("41.4899985"), std::stod("2.1430529")},  // 5155645054
-        Coordinate{std::stod("41.4900251"), std::stod("2.1430759")},  // 5108501275
-        Coordinate{std::stod("41.4902855"), std::stod("2.1433050")},  // 1835227766
-        Coordinate{std::stod("41.4905586"), std::stod("2.1435364")}   // 1835227935
-    };
-
-    std::vector<Coordinate> resultCami2 = {
-        Coordinate{std::stod("41.4915046"), std::stod("2.1484328")},  // 1125567473
-        Coordinate{std::stod("41.4913967"), std::stod("2.1482614")},  // 5370299407
-        Coordinate{std::stod("41.4913714"), std::stod("2.1482221")}   // 5370299406
-    };
-
-    mapaBase->getCamins(vecCamins);
-
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> NUMERO DE CAMINS: " << std::dec << 2 << std::endl;
-        std::cout << "Comment :=>> NUMERO DE CAMINS ESTUDIANT: " << std::dec << vecCamins.size() << std::endl;
-        std::cout << "Comment :=>> PRIMERTEST3[0] : " << ((vecCamins.size() == 2) ? "CORRECTE" : "ERRONI - NO CONTINUEM PRIMERTEST3") << std::endl;
-    }
-
-    if (vecCamins.size() != 2) {
-        std::cout << "Comment :=>> PRIMERTEST3 GRADE 1: 0/2" << std::endl;
-        return 0;
-    }
-
-    CamiBase* cami1 = vecCamins[0];
-    int countResultatsCami1 = 0;
-    int idx = 0;
-    for (Coordinate coord : cami1->getCamiCoords()) {
-        if (coord.lat == resultCami1[idx].lat && coord.lon == resultCami1[idx].lon) {
-            countResultatsCami1++;
-        }
-        idx++;
-    }
-
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> NUMERO DE COORDENADES PEL PRIMER CAMI: " << std::dec << resultCami1.size() << std::endl;
-        std::cout << "Comment :=>> NUMERO DE COORDENADES PEL PRIMER CAMI ESTUDIANT: " << std::dec << countResultatsCami1 << std::endl;
-    }
-
-    grade += (countResultatsCami1 == resultCami1.size()) ? 1.0 : 0.0;
-
-    CamiBase* cami2 = vecCamins[1];
-    int countResultatsCami2 = 0;
-    idx = 0;
-    for (Coordinate coord : cami2->getCamiCoords()) {
-        if (coord.lat == resultCami2[idx].lat && coord.lon == resultCami2[idx].lon) {
-            countResultatsCami2++;
-        }
-        idx++;
-    }
-
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> NUMERO DE COORDENADES PEL SEGON CAMI: " << std::dec << resultCami2.size() << std::endl;
-        std::cout << "Comment :=>> NUMERO DE COORDENADES PEL SEGON CAMI ESTUDIANT: " << std::dec << countResultatsCami2 << std::endl;
-    }
-
-    grade += (countResultatsCami2 == resultCami2.size()) ? 1.0 : 0.0;
-
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> ====================" << std::endl;
-        std::cout << "Comment :=>> FI PRIMER TEST 3" << std::endl;
-        std::cout << "Comment :=>> PRIMERTEST3 GRADE 1 : " << grade << " / 2" << std::endl;
-        std::cout << "Comment :=>> ====================" << std::endl;
-    }
-
-    return grade;
+bool isFromThisCarrer(Coordinate coord, const std::vector<Coordinate>& carrer) {
+  double epsilon = 0.0001;
+  return std::any_of(carrer.begin(), carrer.end(), [&](Coordinate carrer_coords) { return (Util::DistanciaHaversine(carrer_coords, coord) <= epsilon); });
 }
 
-double segonTest1(MapaBase* mapaBase) {
-    double grade = 0;
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> -------------" << std::endl;
-        std::cout << "Comment :=>> Segon Test 1" << std::endl;
-        std::cout << "Comment :=>> -------------" << std::endl;
-        std::cout << "Comment :=>> Provem que tenim dos punts de interes pel segon conjunt de dades, i que son \"la Millor Pastisseria\" i \"el Millor Restaurant\"." << std::endl;
-        std::cout << "Comment :=>> -------------" << std::endl;
-    }
-
-    std::vector<PuntDeInteresBase*> vecPdis = {};
-    mapaBase->getPdis(vecPdis);
-
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> NUMERO DE PUNTS DE INTERES: " << std::dec << 2 << std::endl;
-        std::cout << "Comment :=>> NUMERO DE PUNTS DE INTERES ESTUDIANT: " << std::dec << vecPdis.size() << std::endl;
-        std::cout << "Comment :=>> SEGONTEST1[0] : " << ((vecPdis.size() == 2) ? "CORRECTE" : "ERRONI") << std::endl;
-    }
-
-    bool millorRestaurant = false;
-    bool millorPastisseria = false;
-
-    if (vecPdis.size() == 2) {
-        PuntDeInteresBase colorDefecte;
-        for (PuntDeInteresBase* pdi : vecPdis) {
-            bool isBotigaLatRight = pdi->getCoord().lat >= 41.49186059 && pdi->getCoord().lat <= 41.49186061;
-            bool isBotigaLonRight = pdi->getCoord().lon >= 2.14654109 && pdi->getCoord().lon <= 2.14654111;
-
-            if (isBotigaLatRight && isBotigaLonRight && pdi->getName() == "La Millor Pastisseria" && pdi->getColor() == 0xE85D75) {
-                grade += 4;
-                millorPastisseria = true;
-            }
-
-            bool isRestaurantLatRight = pdi->getCoord().lat >= 41.49022039 && pdi->getCoord().lat <= 41.49022041;
-            bool isRestaurantLonRight = pdi->getCoord().lon >= 2.14064769 && pdi->getCoord().lon <= 2.14064771;
-
-            if (isRestaurantLatRight && isRestaurantLonRight && pdi->getName() == "El Millor Restaurant" && pdi->getColor() == colorDefecte.getColor()) {
-                grade += 4;
-                millorRestaurant = true;
-            }
-        }
-    }
-
-    std::cout << "Comment :=>> SEGONTEST1[1] : MILLOR PASTISSERIA TROBADA: " << (millorPastisseria ? "CORRECTE" : "ERRONI") << std::endl;
-    std::cout << "Comment :=>> SEGONTEST1[2] : MILLOR RESTAURANT TROBAT: " << (millorRestaurant ? "CORRECTE" : "ERRONI") << std::endl;
-
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> ====================" << std::endl;
-        std::cout << "Comment :=>> FI SEGON TEST 1" << std::endl;
-        std::cout << "Comment :=>> SEGONTEST1 GRADE 2 : " << grade << " / 8" << std::endl;
-        std::cout << "Comment :=>> ====================" << std::endl;
-    }
-
-    return grade;
+bool comprovaNodeMesProper(Coordinate pdi, std::result_of<decltype(&creaAvaluadorBallTree)()>::type ballTreeConjunt, std::vector<Coordinate>& carrer, Coordinate& coordenadaEstudiantCamiProper) {
+  coordenadaEstudiantCamiProper = Coordinate{ 0.0, 0.0 };
+  BallTree* arrelBallTree = ballTreeConjunt->cridaGetArrel();
+  coordenadaEstudiantCamiProper = ballTreeConjunt->nodeMesProper(pdi, coordenadaEstudiantCamiProper, arrelBallTree);
+  return isFromThisCarrer(coordenadaEstudiantCamiProper, carrer);
 }
 
-double segonTest2(MapaBase* mapaBase) {
-    double grade = 0.0;
-
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> -------------" << std::endl;
-        std::cout << "Comment :=>> Segon Test 2" << std::endl;
-        std::cout << "Comment :=>> -------------" << std::endl;
-        std::cout << "Comment :=>> Provem que tenim un cami, amb quatre coordenades, pel segon conjunt de dades." << std::endl;
-        std::cout << "Comment :=>> -------------" << std::endl;
-    }
-
-    std::vector<CamiBase*> vecCamins = {};
-
-    mapaBase->getCamins(vecCamins);
-
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> NUMERO DE CAMINS: " << 1 << std::endl;
-        std::cout << "Comment :=>> NUMERO DE CAMINS ESTUDIANT: " << vecCamins.size() << std::endl;
-        std::cout << "Comment :=>> SEGONTEST2[0] : " << ((vecCamins.size() == 1) ? "CORRECTE" : "ERRONI - NO COMPROVEM NUMERO DE COORDENADES") << std::endl;
-    }
-
-    if (vecCamins.size() == 1) {
-        grade += 1;
-
-        if (mostraDetalls) {
-            std::cout << "Comment :=>> NUMERO DE COORDENADES PEL PRIMER CAMI: " << 4 << std::endl;
-            std::cout << "Comment :=>> NUMERO DE COORDENADES PEL PRIMER CAMI ESTUDIANT: " << vecCamins[0]->getCamiCoords().size() << std::endl;
-            std::cout << "Comment :=>> SEGONTEST3[0] : " << ((vecCamins[0]->getCamiCoords().size() == 4) ? "CORRECTE" : "ERRONI") << std::endl;
-        }
-
-        if (vecCamins[0]->getCamiCoords().size() == 4) {
-            grade += 1;
-        }
-    }
-
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> ====================" << std::endl;
-        std::cout << "Comment :=>> FI SEGON TEST 2" << std::endl;
-        std::cout << "Comment :=>> SEGONTEST2 GRADE 2 : " << grade << " / 2" << std::endl;
-        std::cout << "Comment :=>> ====================" << std::endl;
-    }
-
-    return grade;
+void mostraCoordenadaEstudiantAmbCami(Coordinate coordenada, const std::vector<Coordinate>& cami) {
+  std::cout << std::fixed << std::setprecision(7) << "Comment :=>> (" << coordenada.lat << ", " << coordenada.lon << ") AL CAMI: " << std::endl;
+  for (Coordinate coord : cami) {
+    std::cout << "Comment :=>>\t (" << coord.lat << ", " << coord.lon << ")" << std::endl;
+  }
 }
 
-struct PdiResult {
-    Coordinate coordenada;
-    unsigned int color;
-};
-
-double tercerTest1(MapaBase* mapaBase) {
-    double grade = 0;
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> -------------" << std::endl;
-        std::cout << "Comment :=>> Tercer Test 1" << std::endl;
-        std::cout << "Comment :=>> -------------" << std::endl;
-        std::cout << "Comment :=>> Provem que tenim els restaurants de Cerdanyola amb els colors pertinents, amb el tercer conjunt de dades." << std::endl;
-        std::cout << "Comment :=>> Aquests son:" << std::endl;
-        std::cout << "Comment :=>> \t El Viejo Roble 0x251351" << std::endl;
-        std::cout << "Comment :=>> \t Nueva China amb color 0xA6D9F7" << std::endl;
-        std::cout << "Comment :=>> \t Anec de Pekin amb color per defecte" << std::endl;
-        std::cout << "Comment :=>> \t La Tasca de Ca l'Enric amb color per defecte" << std::endl;
-        std::cout << "Comment :=>> \t Paco Junior amb color per defecte" << std::endl;
-        std::cout << "Comment :=>> \t El Colosseo amb color 0x03FCBA " << std::endl;
-        std::cout << "Comment :=>> -------------" << std::endl;
+void mostraCoordenadesRecorregutBallTree(const std::vector<std::list<Coordinate>>& estudiant_recorregut, const std::vector<std::list<Coordinate>>& expected) {
+  std::cout << "Comment :=>> RECORREGUT ESTUDIANT" << std::endl;
+  for (auto vec_out : estudiant_recorregut) {
+    for (auto coord : vec_out) {
+      std::cout << std::fixed << std::setprecision(7) << "Comment :=>> Coordenada: [" << coord.lat << ", " << coord.lon << "]" << std::endl;
     }
+    std::cout << "Comment :=>> ---------" << std::endl;
+  }
 
-    double eps = 0.0000001;
-    std::vector<PuntDeInteresBase*> vecPdis = {};
-    PuntDeInteresBase* quinColorDefecteTinc = new PuntDeInteresBase();
-
-    mapaBase->getPdis(vecPdis);
-
-    std::map<std::string, int> estudiantMap;
-
-    std::map<std::string, PdiResult> resultatMap;
-    resultatMap.insert({"El Viejo Roble", PdiResult{Coordinate{41.4902204, 2.1406477}, 0x251351}});
-    resultatMap.insert({"Nueva China", PdiResult{Coordinate{41.4902107, 2.1411346}, 0xA6D9F7}});
-    resultatMap.insert({"Anec de Pekin", PdiResult{Coordinate{41.4907316, 2.1456752}, quinColorDefecteTinc->getColor()}});
-    resultatMap.insert({"la Tasca de Ca l'Enric", PdiResult{Coordinate{41.4907410, 2.1473352}, quinColorDefecteTinc->getColor()}});
-    resultatMap.insert({"Paco Junior", PdiResult{Coordinate{41.4905910, 2.1450548}, quinColorDefecteTinc->getColor()}});
-    resultatMap.insert({"El Colosseo", PdiResult{Coordinate{41.4928550, 2.1426380}, 0x03FCBA}});
-
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> NUMERO DE PUNTS DE INTERES: " << 6 << std::endl;
-        std::cout << "Comment :=>> NUMERO DE PUNTS DE INTERES ESTUDIANT: " << vecPdis.size() << std::endl;
-        std::cout << "Comment :=>> TERCERTEST1[0] : " << ((vecPdis.size() == 6) ? "CORRECTE" : "ERRONI") << std::endl;
+  std::cout << "Comment :=>> RECORREGUT ESPERAT" << std::endl;
+  for (auto vec_out : expected) {
+    for (auto coord : vec_out) {
+      std::cout << std::fixed << std::setprecision(7) << "Comment :=>> Coordenada: [" << coord.lat << ", " << coord.lon << "]" << std::endl;
     }
-
-    if (vecPdis.size() == resultatMap.size()) {
-        grade += 0.5;
-    }
-
-    int i = 1;
-    for (PuntDeInteresBase* pdi : vecPdis) {
-        std::cout << std::endl;
-        if (resultatMap.count(pdi->getName()) == 0) {
-            std::cout << "Comment :=>> PUNT DE INTERES ESTUDIANT TERCERTEST1[" << i << "] NO TROBAT " + pdi->getName() + " EN EL CONJUNT DE RESULTATS = ERRONI" << std::endl;
-            i++;
-            continue;
-        }
-
-        PdiResult pdiResult = resultatMap[pdi->getName()];
-        resultatMap.erase(pdi->getName());
-
-        if (pdiResult.color != pdi->getColor() || Util::DistanciaHaversine(pdiResult.coordenada, pdi->getCoord()) > eps) {
-            if (mostraDetalls) {
-                std::cout << "Comment :=>> PUNT DE INTERES ESTUDIANT TERCERTEST1[" << i << "] [" << pdi->getName() << "] ERRONI -> COORDENADA = (" << pdi->getCoord().lat << ", " << pdi->getCoord().lon << " ) i COLOR = 0x" << std::hex << std::uppercase << pdi->getColor() << std::endl;
-            }
-        } else {
-            if (pdi->getColor() == quinColorDefecteTinc->getColor()) {
-                grade += 0.5;
-            } else {
-                grade += 1;
-            }
-            if (mostraDetalls) {
-                std::cout << "Comment :=>> PUNT DE INTERES ESTUDIANT TERCERTEST1[" << i << "] [" << pdi->getName() << "] CORRECTE -> COORDENADA = (" << pdi->getCoord().lat << ", " << pdi->getCoord().lon << " ) i COLOR = 0x" << std::hex << std::uppercase << pdi->getColor() << std::endl;
-            }
-        }
-        if (mostraDetalls) {
-            std::cout << "Comment :=>> PUNT DE INTERES RESULTAT TERCERTEST1[" << i << "] [" << pdi->getName() << "] -> COORDENADA = (" << pdiResult.coordenada.lat << ", " << pdiResult.coordenada.lon << ") i COLOR = 0x" << std::hex << std::uppercase << pdiResult.color << std::endl;
-        }
-
-        i++;
-    }
-
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> ====================" << std::endl;
-        std::cout << "Comment :=>> FI TERCER TEST 1" << std::endl;
-        std::cout << "Comment :=>> TERCERTEST1 GRADE 3 : " << grade << " / 5" << std::endl;
-        std::cout << "Comment :=>> ====================" << std::endl;
-    }
-
-    return grade;
+    std::cout << "Comment :=>> ---------" << std::endl;
+  }
 }
 
-double tercerTest2(MapaBase* mapaBase) {
-    double grade = 0.0;
-    std::cout << std::dec;
-
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> -------------" << std::endl;
-        std::cout << "Comment :=>> Tercer Test 2" << std::endl;
-        std::cout << "Comment :=>> Provem que tenim dos carrers, el Carrer Pineda i Altimira, del tercer conjunt de dades." << std::endl;
-        std::cout << "Comment :=>> -------------" << std::endl;
+bool comprovaCamiMesCurt(const std::vector<Coordinate>& expected, const std::vector<Coordinate>& estudiant) {
+  bool check = true;
+  double epsilon = 0.0001;
+  if (estudiant.size() != expected.size()) {
+    check = false;
+  }
+  else {
+    for (int i = 0; i < estudiant.size(); i++) {
+      if (Util::DistanciaHaversine(estudiant[i], expected[i]) > epsilon) {
+        check = false;
+      }
     }
+  }
 
-    double eps = 0.0000001;
+  if (!check) {
+    std::cout << "Comment :=>> INCORRECTE" << std::endl;
+  }
+  else {
+    std::cout << "Comment :=>> CORRECTE" << std::endl;
+  }
 
-    double temporalGrade = 0.0;
+  std::cout << "Comment :=>> CAMI ESTUDIANT" << std::endl;
+  for (Coordinate coord : estudiant) {
+    std::cout << "Comment :=>> " << std::fixed << std::setprecision(7) << "(" << coord.lat << ", " << coord.lon << ")" << std::endl;
+  }
 
-    std::vector<CamiBase*> vecCamins = {};
-    mapaBase->getCamins(vecCamins);
+  std::cout << "Comment :=>> CAMI ESPERAT" << std::endl;
+  for (Coordinate coord : expected) {
+    std::cout << "Comment :=>> " << std::fixed << std::setprecision(7) << "(" << coord.lat << ", " << coord.lon << ")" << std::endl;
+  }
 
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> NUMERO DE CAMINS: " << 2 << std::endl;
-        std::cout << "Comment :=>> NUMERO DE CAMINS ESTUDIANT: " << vecCamins.size() << std::endl;
-        std::cout << "Comment :=>> TERCERTEST2[0] : " << ((vecCamins.size() == 2) ? "CORRECTE" : "ERRONI - NO CONTINUEM AQUEST TERCERTEST2") << std::endl;
-    }
-
-    if (vecCamins.size() == 2) {
-        grade += 1;
-
-        int idxCamiPineda = vecCamins[0]->getCamiCoords().size() == 4 ? 0 : 1;
-        int idxCamiAltimira = vecCamins[1]->getCamiCoords().size() == 13 ? 1 : 0;
-
-        std::vector<Coordinate> pinedaCords = vecCamins[idxCamiPineda]->getCamiCoords();
-        std::vector<bool> trobat;
-        trobat.resize(pinedaCords.size(), false);
-
-        if (mostraDetalls) {
-            std::cout << "Comment :=>> BUSQUEM COORDENADES DEL PRIMER CAMI [Pineda]" << std::endl;
-        }
-
-        for (int i = 0; i < pinedaCords.size(); i++) {
-            if (Util::DistanciaHaversine(pinedaCords[i], Coordinate{41.4893533, 2.1475936}) <= eps) {
-                temporalGrade += 1;
-                if (mostraDetalls)
-                    std::cout << "Comment :=>> Coordinate{ 41.4893533, 2.1475936 } TROBADA" << std::endl;
-            } else if (Util::DistanciaHaversine(pinedaCords[i], Coordinate{41.4893063, 2.1476552}) <= eps) {
-                temporalGrade += 1;
-                if (mostraDetalls)
-                    std::cout << "Comment :=>> Coordinate{ 41.4893063, 2.1476552 } TROBADA" << std::endl;
-            } else if (Util::DistanciaHaversine(pinedaCords[i], Coordinate{41.4892612, 2.1476832}) <= eps) {
-                temporalGrade += 1;
-                if (mostraDetalls)
-                    std::cout << "Comment :=>> Coordinate{ 41.4892612, 2.1476832 } TROBADA" << std::endl;
-            } else if (Util::DistanciaHaversine(pinedaCords[i], Coordinate{41.4892160, 2.1476900}) <= eps) {
-                temporalGrade += 1;
-                if (mostraDetalls)
-                    std::cout << "Comment :=>> Coordinate{ 41.4892160, 2.1476900 } TROBADA" << std::endl;
-            }
-        }
-
-        std::cout << "Comment :=>> COORDENADES ESTUDIANT PEL CAMI PINEDA: " << std::endl;
-
-        std::vector<Coordinate> altimiraCords = vecCamins[idxCamiAltimira]->getCamiCoords();
-        trobat.clear();
-        trobat.resize(altimiraCords.size(), false);
-
-        if (mostraDetalls)
-            std::cout << "Comment :=>> BUSQUEM COORDENADES DEL SEGON CAMI [Altimira]" << std::endl;
-
-        for (int i = 0; i < altimiraCords.size(); i++) {
-            if (Util::DistanciaHaversine(altimiraCords[i], Coordinate{41.4900914, 2.1386712}) <= eps) {
-                temporalGrade += 1;
-                if (mostraDetalls)
-                    std::cout << "Comment :=>> Coordinate{ 41.4900914, 2.1386712 } TROBADA" << std::endl;
-            } else if (Util::DistanciaHaversine(altimiraCords[i], Coordinate{41.4900494, 2.1387747}) <= eps) {
-                temporalGrade += 1;
-                if (mostraDetalls)
-                    std::cout << "Comment :=>> Coordinate{ 41.4900494, 2.1387747 } TROBADA" << std::endl;
-            } else if (Util::DistanciaHaversine(altimiraCords[i], Coordinate{41.4902404, 2.1398993}) <= eps) {
-                temporalGrade += 1;
-                if (mostraDetalls)
-                    std::cout << "Comment :=>> Coordinate{ 41.4902404, 2.1398993 } TROBADA" << std::endl;
-            } else if (Util::DistanciaHaversine(altimiraCords[i], Coordinate{41.4902536, 2.1399715}) <= eps) {
-                temporalGrade += 1;
-                if (mostraDetalls)
-                    std::cout << "Comment :=>> Coordinate{ 41.4902536, 2.1399715 } TROBADA" << std::endl;
-            } else if (Util::DistanciaHaversine(altimiraCords[i], Coordinate{41.4902678, 2.1400551}) <= eps) {
-                temporalGrade += 1;
-                if (mostraDetalls)
-                    std::cout << "Comment :=>> Coordinate{ 41.4902678, 2.1400551 } TROBADA" << std::endl;
-            } else if (Util::DistanciaHaversine(altimiraCords[i], Coordinate{41.4904349, 2.1410368}) <= eps) {
-                temporalGrade += 1;
-                if (mostraDetalls)
-                    std::cout << "Comment :=>> Coordinate{ 41.4904349, 2.1410368 } TROBADA" << std::endl;
-            } else if (Util::DistanciaHaversine(altimiraCords[i], Coordinate{41.4904397, 2.1410612}) <= eps) {
-                temporalGrade += 1;
-                if (mostraDetalls)
-                    std::cout << "Comment :=>> Coordinate{ 41.4904397, 2.1410612 } TROBADA" << std::endl;
-            } else if (Util::DistanciaHaversine(altimiraCords[i], Coordinate{41.4904526, 2.1411267}) <= eps) {
-                temporalGrade += 1;
-                if (mostraDetalls)
-                    std::cout << "Comment :=>> Coordinate{ 41.4904526, 2.1411267 } TROBADA" << std::endl;
-            } else if (Util::DistanciaHaversine(altimiraCords[i], Coordinate{41.4904733, 2.1412260}) <= eps) {
-                temporalGrade += 1;
-                if (mostraDetalls)
-                    std::cout << "Comment :=>> Coordinate{ 41.4904733, 2.1412260 } TROBADA" << std::endl;
-            } else if (Util::DistanciaHaversine(altimiraCords[i], Coordinate{41.4904989, 2.1413415}) <= eps) {
-                temporalGrade += 1;
-                if (mostraDetalls)
-                    std::cout << "Comment :=>> Coordinate{ 41.4904989, 2.1413415 } TROBADA" << std::endl;
-            } else if (Util::DistanciaHaversine(altimiraCords[i], Coordinate{41.4905271, 2.1414810}) <= eps) {
-                temporalGrade += 1;
-                if (mostraDetalls)
-                    std::cout << "Comment :=>> Coordinate{ 41.4905271, 2.1414810 } TROBADA" << std::endl;
-            } else if (Util::DistanciaHaversine(altimiraCords[i], Coordinate{41.4905984, 2.1415427}) <= eps) {
-                temporalGrade += 1;
-                if (mostraDetalls)
-                    std::cout << "Comment :=>> Coordinate{ 41.4905984, 2.1415427 } TROBADA" << std::endl;
-            } else if (Util::DistanciaHaversine(altimiraCords[i], Coordinate{41.4906473, 2.1415473}) <= eps) {
-                temporalGrade += 1;
-                if (mostraDetalls)
-                    std::cout << "Comment :=>> Coordinate{ 41.4906473, 2.1415473 } TROBADA" << std::endl;
-            }
-        }
-
-        int i = 0;
-        std::cout << "Comment :=>> COORDENADES ESTUDIANT PINEDA:" << std::endl;
-        for (auto resultatPineda : pinedaCords) {
-            std::cout << "Comment :=>> "
-                      << "[" << i << "] - Altimira Estudiant Coordinate { " << resultatPineda.lat << ", " << resultatPineda.lon << " } " << std::endl;
-            i++;
-        }
-        i = 0;
-
-        std::list<Coordinate> pinedaResultatCarrer;
-        pinedaResultatCarrer.push_back(Coordinate{41.4893533, 2.1475936});
-        pinedaResultatCarrer.push_back(Coordinate{41.4893063, 2.1476552});
-        pinedaResultatCarrer.push_back(Coordinate{41.4892612, 2.1476832});
-        pinedaResultatCarrer.push_back(Coordinate{41.4892160, 2.1476900});
-
-        std::cout << "Comment :=>> COORDENADES RESULTAT PINEDA: " << std::endl;
-        for (auto resultatPineda : pinedaResultatCarrer) {
-            std::cout << "Comment :=>> "
-                      << "[" << i << "] - Pineda Resultat Coordinate { " << resultatPineda.lat << ", " << resultatPineda.lon << " } " << std::endl;
-            i++;
-        }
-
-        i = 0;
-
-        std::cout << "Comment :=>> COORDENADES ESTUDIANT ALTIMIRA: " << std::endl;
-        for (auto resultatAltimira : altimiraCords) {
-            std::cout << "Comment :=>> "
-                      << "[" << i << "] - Altimira Estudiant Coordinate { " << resultatAltimira.lat << ", " << resultatAltimira.lon << " } " << std::endl;
-            i++;
-        }
-
-        std::list<Coordinate> altimiraResultatCarrer;
-        altimiraResultatCarrer.push_back(Coordinate{41.4900914, 2.1386712});
-        altimiraResultatCarrer.push_back(Coordinate{41.4900494, 2.1387747});
-        altimiraResultatCarrer.push_back(Coordinate{41.4902404, 2.1398993});
-        altimiraResultatCarrer.push_back(Coordinate{41.4902536, 2.1399715});
-        altimiraResultatCarrer.push_back(Coordinate{41.4902678, 2.1400551});
-        altimiraResultatCarrer.push_back(Coordinate{41.4904349, 2.1410368});
-        altimiraResultatCarrer.push_back(Coordinate{41.4904397, 2.1410612});
-        altimiraResultatCarrer.push_back(Coordinate{41.4904526, 2.1411267});
-        altimiraResultatCarrer.push_back(Coordinate{41.4904733, 2.1412260});
-        altimiraResultatCarrer.push_back(Coordinate{41.4904989, 2.1413415});
-        altimiraResultatCarrer.push_back(Coordinate{41.4905271, 2.1414810});
-        altimiraResultatCarrer.push_back(Coordinate{41.4905984, 2.1415427});
-        altimiraResultatCarrer.push_back(Coordinate{41.4906473, 2.1415473});
-
-        std::cout << "Comment :=>> COORDENADES RESULTAT ALTIMIRA: " << std::endl;
-
-        i = 0;
-        for (auto resultatAltimira : altimiraResultatCarrer) {
-            std::cout << "Comment :=>> [" << i << "] - Altimira Resultat Coordinate { " << resultatAltimira.lat << ", " << resultatAltimira.lon << " } " << std::endl;
-            i++;
-        }
-    }
-
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> NUMERO DE COORDENADES TROBADES PELS DOS CAMINS: " << 17 << std::endl;
-        std::cout << "Comment :=>> NUMERO DE COORDANDES TROBADES PELS DOS CAMINS ESTUDIANT: " << temporalGrade << std::endl;
-        std::cout << "Comment :=>> TERCERTEST2[1] : " << ((temporalGrade == 17) ? "CORRECTE" : "ERRONI") << std::endl;
-    }
-
-    temporalGrade = 4 * (temporalGrade / 17);
-    grade += temporalGrade;
-
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> ====================" << std::endl;
-        std::cout << "Comment :=>> FI TERCER TEST 2" << std::endl;
-        std::cout << "Comment :=>> TERCERTEST2 GRADE 3 : " << grade << " / 5" << std::endl;
-        std::cout << "Comment :=>> ====================" << std::endl;
-    }
-
-    return grade;
+  return check;
 }
 
-double quartTest1(MapaBase* mapaBase) {
-    double grade = 0.0;
 
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> -------------" << std::endl;
-        std::cout << "Comment :=>> Quart Test 1" << std::endl;
-        std::cout << "Comment :=>> Provem que tenim quatre punts de interes botiga, amb els seus colors corresponents, del quart conjunt de dades." << std::endl;
-        std::cout << "Comment :=>> Aquests son:" << std::endl;
-        std::cout << "Comment :=>> \t UnSupermarket amb color 0xA5BE00" << std::endl;
-        std::cout << "Comment :=>> \t UnTobacco amb color 0xFFAD69" << std::endl;
-        std::cout << "Comment :=>> \t UnaBakery amb color 0xE85D75" << std::endl;
-        std::cout << "Comment :=>> \t UnaBakeryAmbMobRedTancada amb color 0xE85D75" << std::endl;
-        std::cout << "Comment :=>> \t UnaBakeryAmbMobRedOberta amb color 0x4CB944" << std::endl;
-        std::cout << "Comment :=>> \t Un Shop restant amb color 0xEFD6AC" << std::endl;
-        std::cout << "Comment :=>> -------------" << std::endl;
-    }
+double primerTestTasca2() {
+  double grade = 0;
+  std::vector<Coordinate> coordenades = { Coordinate{ 41.9023349 , 12.5138592 }, Coordinate{ 41.4501930 , 2.2448922 }, Coordinate{ 41.9674134 , 2.8212290 } };
 
-    std::vector<PuntDeInteresBase*> vec_pdis = {};
-    mapaBase->getPdis(vec_pdis);
+  std::vector<int> sizes_pre_out = { 3, 2, 1, 1, 1 };
+  std::vector<std::list<Coordinate>> expected_pre_out = {
+      {Coordinate {41.9023349, 12.5138592}, Coordinate {41.4501930, 2.2448922}, Coordinate {41.9674134 , 2.8212290 }},
+      {Coordinate {41.4501930 , 2.2448922}, Coordinate {41.9674134, 2.8212290}},
+      {Coordinate {41.9674134, 2.8212290}},
+      {Coordinate {41.4501930, 2.2448922}},
+      {Coordinate {41.9023349, 12.5138592}}
+  };
 
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> NUMERO DE PUNTS DE INTERES: " << 6 << std::endl;
-        std::cout << "Comment :=>> NUMERO DE PUNTS DE INTERES ESTUDIANT: " << vec_pdis.size() << std::endl;
-        std::cout << "Comment :=>> QUARTTEST1[0] : " << ((vec_pdis.size() == 6) ? "CORRECTE" : "ERRONI") << std::endl;
-    }
+  std::vector<int> sizes_in_out = { 1, 2, 1, 3, 1 };
+  std::vector<std::list<Coordinate>> expected_in_out = {
+      {Coordinate {41.9674134, 2.8212290}},
+      {Coordinate {41.4501930 , 2.2448922}, Coordinate {41.9674134, 2.8212290}},
+      {Coordinate {41.4501930, 2.2448922}},
+      {Coordinate {41.9023349, 12.5138592}, Coordinate {41.4501930, 2.2448922}, Coordinate {41.9674134 , 2.8212290 }},
+      {Coordinate {41.9023349, 12.5138592}}
+  };
 
-    for (auto pdi : vec_pdis) {
-        if (pdi->getName() == "UnSupermarket" && pdi->getColor() == 0xA5BE00) {
-            if (mostraDetalls)
-                std::cout << "Comment :=>> ESTUDIANT HA TROBAT EL UNSUPERMARKET" << std::endl;
-            grade += 4;
-        } else if (pdi->getName() == "UnTobacco" && pdi->getColor() == 0xFFAD69) {
-            if (mostraDetalls)
-                std::cout << "Comment :=>> ESTUDIANT HA TROBAT UNTOBACCO" << std::endl;
-            grade += 1;
-        }
+  std::vector<int> sizes_post_out = { 1, 1, 2, 1, 3 };
+  std::vector<std::list<Coordinate>> expected_post_out = {
+      {Coordinate {41.9674134, 2.8212290}},
+      {Coordinate {41.4501930, 2.2448922}},
+      {Coordinate {41.4501930 , 2.2448922}, Coordinate {41.9674134, 2.8212290}},
+      {Coordinate {41.9023349, 12.5138592}},
+      {Coordinate {41.9023349, 12.5138592}, Coordinate {41.4501930, 2.2448922}, Coordinate {41.9674134 , 2.8212290 }}
+  };
 
-        else if (pdi->getName() == "UnaBakery" && pdi->getColor() == 0xE85D75) {
-            if (mostraDetalls)
-                std::cout << "Comment :=>> ESTUDIANT HA TROBAT UNABAKERY" << std::endl;
-            grade += 1;
-        }
+  std::vector<int> sizes_student = {};
 
-        else if (pdi->getName() == "UnaBakeryAmbMobRedOberta" &&
-                 pdi->getColor() == 0x4CB944) {
-            if (mostraDetalls)
-                std::cout << "Comment :=>> ESTUDIANT HA TROBAT UNABAKERY PER MOB. REDUIDA OBERTA" << std::endl;
-            grade += 2;
-        }
+  std::vector<std::list<Coordinate>> recorregutOut;
 
-        else if (pdi->getName() == "UnaBakeryAmbMobRedTancada" && pdi->getColor() == 0xE85D75) {
-            if (mostraDetalls)
-                std::cout << "Comment :=>> ESTUDIANT HA TROBAT UNABAKERY PER MOB. REDUIDA TANCADA" << std::endl;
-            grade += 1;
-        }
+  auto ballTreeConjunt1 = creaAvaluadorBallTree();
+  ballTreeConjunt1->cridaConstruirArbre(coordenades);
 
-        else if (pdi->getName() == "UnaShopRestant" && pdi->getColor() == 0xEFD6AC) {
-            if (mostraDetalls)
-                std::cout << "Comment :=>> ESTUDIANT HA TROBAT UN ALTRE SHOP" << std::endl;
-            grade += 1;
-        }
-    }
-    if (mostraDetalls) {
-        std::cout << "Comment :=>> ====================" << std::endl;
-        std::cout << "Comment :=>> FI QUART TEST 1" << std::endl;
-        std::cout << "Comment :=>> QUARTEST1 GRADE 4 : " << grade << " / 10" << std::endl;
-        std::cout << "Comment :=>> ====================" << std::endl;
-    }
+  recorregutOut.clear();
+  ballTreeConjunt1->cridaRecorregutPreordre(recorregutOut);
+  std::cout << "Comment :=>> PREORDRE" << std::endl;
+  if (checkRecorreguts(recorregutOut, expected_pre_out)) {
+    std::cout << "Comment :=>> CORRECTE PREORDRE" << std::endl;
+    grade += 3.5;
+  }
+  else {
+    std::cout << "Comment :=>> INCORRECTE PREORDRE" << std::endl;
+  }
+  mostraCoordenadesRecorregutBallTree(recorregutOut, expected_pre_out);
 
-    return grade;
+  recorregutOut.clear();
+  ballTreeConjunt1->cridaRecorregutInordre(recorregutOut);
+  std::cout << "Comment :=>> INORDRE" << std::endl;
+  if (checkRecorreguts(recorregutOut, expected_in_out)) {
+    std::cout << "Comment :=>> CORRECTE INORDRE" << std::endl;
+    grade += 3.5;
+  }
+  else {
+    std::cout << "Comment :=>> INCORRECTE INORDRE" << std::endl;
+  }
+  mostraCoordenadesRecorregutBallTree(recorregutOut, expected_in_out);
+
+  recorregutOut.clear();
+  ballTreeConjunt1->cridaRecorregutPostordre(recorregutOut);
+  std::cout << "Comment :=>> POSTORDRE" << std::endl;
+  if (checkRecorreguts(recorregutOut, expected_post_out)) {
+    std::cout << "Comment :=>> CORRECTE POSTORDRE" << std::endl;
+    grade += 3.0;
+  }
+  else {
+    std::cout << "Comment :=>> INCORRECTE POSTORDRE" << std::endl;
+  }
+  mostraCoordenadesRecorregutBallTree(recorregutOut, expected_post_out);
+
+  return grade;
 }
+
+
+
+double primerTestTasca3() {
+  double grade = 0.0;
+
+  std::vector<Coordinate> coordenadesBallTree = {
+  };
+
+  std::vector<Coordinate> tresCreus = {
+      // Carrer de les Tres Creus (prop de l'escola):
+      Coordinate{ 41.5462276, 41.5462276 },		// 1398537376
+      Coordinate{ 41.5461827, 2.1183831 },		// 6644216590
+      Coordinate{ 41.5461758, 2.1185303 },		// 1446297966
+      Coordinate{ 41.5461621, 2.1190732 },		// 965631509
+      Coordinate{ 41.5461331, 2.1192704 },		// 965631510
+      Coordinate{ 41.5460159, 2.1196473 },		// 965631511
+  };
+
+  std::vector<Coordinate> carrerMexic = {
+      // Carrer de Mexic (prop de pl espanya) (300828573):
+      Coordinate{ 41.3735460, 2.1474414 },		// 3049188208
+      Coordinate{ 41.3734884, 2.1475119 },		// 5164105472
+      Coordinate{ 41.3734766, 2.1475300 },		// 3049188207
+      Coordinate{ 41.3728068, 2.1484139 },		// 6273277446
+      Coordinate{ 41.3727909, 2.1484343 },		// 7038308614
+      Coordinate{ 41.3727294, 2.1485133 },		// 30298941
+      Coordinate{ 41.3726845, 2.1485728 },		// 7038308611
+      Coordinate{ 41.3721500, 2.1492825 },		// 7038601991
+      Coordinate{ 41.3721176, 2.1493255 },		// 30264242
+      Coordinate{ 41.3717495, 2.1498152 },		// 30298942
+      Coordinate{ 41.3713935, 2.1502866 },		// 7038742370
+      Coordinate{ 41.3712752, 2.1504433 },		// 168330638
+  };
+
+  std::vector<Coordinate> foothPathEiffel = {
+      // Foothpath on Eiffel (27878420)
+      Coordinate {48.8614544, 2.2887899},
+      Coordinate {48.8615269, 2.2887754},
+      Coordinate {48.8617429, 2.2890997},
+      Coordinate {48.8619692, 2.2894425}
+  };
+
+  for (Coordinate coord : tresCreus) {
+    coordenadesBallTree.push_back(coord);
+  }
+
+  for (Coordinate coord : carrerMexic) {
+    coordenadesBallTree.push_back(coord);
+  }
+
+  for (Coordinate coord : foothPathEiffel) {
+    coordenadesBallTree.push_back(coord);
+  }
+
+  auto ballTreeConjunt3 = creaAvaluadorBallTree();
+  ballTreeConjunt3->cridaConstruirArbre(coordenadesBallTree);
+  BallTree* arrelBallTree = ballTreeConjunt3->cridaGetArrel();
+
+  Coordinate barCantonada = { 41.5460159, 2.1196473 };			// 1623786562
+  Coordinate cycleParking = { 41.3715000, 2.1499900 };			// 6933513738
+  Coordinate capraboSupermarket = { 41.3721415, 2.1475164 };		// 6504150085
+  Coordinate artworkHomme = { 48.8615587, 2.2891173 };			// 2680395469
+  Coordinate artworkFemme = { 48.8617122, 2.2893496 };			// 2680395492
+
+  Coordinate estudiantResultat;
+
+  std::cout << "Comment :=>> Bar Cantonada (" << barCantonada.lat << ", " << barCantonada.lon << ")" << std::endl;
+  if (comprovaNodeMesProper(barCantonada, ballTreeConjunt3, tresCreus, estudiantResultat)) {
+    std::cout << "Comment :=>> CORRECTE: ";
+    grade += 2;
+  }
+  else {
+    std::cout << "Comment :=>> INCORRECTE: ";
+  }
+  mostraCoordenadaEstudiantAmbCami(estudiantResultat, tresCreus);
+
+  std::cout << "Comment :=>> Cycle Parking (" << cycleParking.lat << ", " << cycleParking.lon << ")" << std::endl;
+  if (comprovaNodeMesProper(cycleParking, ballTreeConjunt3, carrerMexic, estudiantResultat)) {
+    std::cout << "Comment :=>> CORRECTE: ";
+    grade += 2;
+  }
+  else {
+    std::cout << "Comment :=>> INCORRECTE: ";
+  }
+  mostraCoordenadaEstudiantAmbCami(estudiantResultat, carrerMexic);
+
+  std::cout << "Comment :=>> Supermercat Caprabo (" << capraboSupermarket.lat << ", " << capraboSupermarket.lon << ")" << std::endl;
+  if (comprovaNodeMesProper(capraboSupermarket, ballTreeConjunt3, carrerMexic, estudiantResultat)) {
+    std::cout << "Comment :=>> CORRECTE: ";
+    grade += 2;
+  }
+  else {
+    std::cout << "Comment :=>> INCORRECTE: ";
+  }
+  mostraCoordenadaEstudiantAmbCami(estudiantResultat, carrerMexic);
+
+  std::cout << "Comment :=>> Artwork Homme (" << artworkHomme.lat << ", " << artworkHomme.lon << ")" << std::endl;
+  if (comprovaNodeMesProper(artworkHomme, ballTreeConjunt3, foothPathEiffel, estudiantResultat)) {
+    std::cout << "Comment :=>> CORRECTE: ";
+    grade += 2;
+  }
+  else {
+    std::cout << "Comment :=>> INCORRECTE: ";
+  }
+  mostraCoordenadaEstudiantAmbCami(estudiantResultat, foothPathEiffel);
+
+  std::cout << "Comment :=>> Artwork Femme (" << artworkFemme.lat << ", " << artworkFemme.lon << ")" << std::endl;
+  if (comprovaNodeMesProper(artworkFemme, ballTreeConjunt3, foothPathEiffel, estudiantResultat)) {
+    std::cout << "Comment :=>> CORRECTE: ";
+    grade += 2;
+  }
+  else {
+    std::cout << "Comment :=>> INCORRECTE: ";
+  }
+  mostraCoordenadaEstudiantAmbCami(estudiantResultat, foothPathEiffel);
+
+  return grade;
+}
+
+
+double primerTestTasca4(MapaBase* mapaBase) {
+  double grade = 0.0;
+
+  PuntDeInteresBase* PacoJunior = new PuntDeInteresBase(Coordinate{ 41.4905910 , 2.1450548 }, "Paco Junior");
+  PuntDeInteresBase* DiaMarket = new PuntDeInteresBase(Coordinate{ 41.4910993, 2.1446911 }, "Dia Market");
+
+  PuntDeInteresBase* AnecPekin = new PuntDeInteresBase(Coordinate{ 41.4907316, 2.1456752 }, "Anec Pekin");
+  PuntDeInteresBase* Castaneria = new PuntDeInteresBase(Coordinate{ 41.4915513, 2.1444433 }, "Castaniera");
+
+  // Paco Junior -> Dia Market
+  std::vector<Coordinate> expectedPacoJuniorToMarketCoordinates = {
+      Coordinate{41.4905717, 2.1452803},
+      Coordinate{41.4903783, 2.1451197},
+      Coordinate{41.4903555, 2.1451012},
+      Coordinate{41.4903253, 2.1450766},
+      Coordinate{41.4902942, 2.1450513},
+      Coordinate{41.4903447, 2.1450105},
+      Coordinate{41.4903717, 2.1449829},
+      Coordinate{41.4903894, 2.1449680},
+      Coordinate{41.4904834, 2.1448766},
+      Coordinate{41.4905729, 2.1447814},
+      Coordinate{41.4906402, 2.1446621},
+      Coordinate{41.4907541, 2.1443886},
+  };
+
+
+  // Anec Pekin -> Bar Casteneria
+  std::vector<Coordinate> expectedPekinToCasteneria = {
+      Coordinate{41.4907640, 2.1456588},
+      Coordinate{41.4908004, 2.1456486},
+      Coordinate{41.4908319, 2.1456497},
+      Coordinate{41.4908287, 2.1455688},
+      Coordinate{41.4908118, 2.1455548},
+      Coordinate{41.4906945, 2.1454576},
+      Coordinate{41.4905422, 2.1453428},
+      Coordinate{41.4905152, 2.1453211},
+      Coordinate{41.4904251, 2.1452485},
+      Coordinate{41.4904520, 2.1452302},
+      Coordinate{41.4904791, 2.1452407},
+      Coordinate{41.4904996, 2.1452578},
+      Coordinate{41.4906654, 2.1453960},
+      Coordinate{41.4907399, 2.1454220},
+      Coordinate{41.4908966, 2.1455540},
+      Coordinate{41.4909207, 2.1455756},
+      Coordinate{41.4909425, 2.1455221},
+      Coordinate{41.4909680, 2.1454587},
+      Coordinate{41.4914979, 2.1441483},
+      Coordinate{41.4915371, 2.1441859},
+      Coordinate{41.4918198, 2.1444718},
+      Coordinate{41.4917198, 2.1446255},
+      Coordinate{41.4916581, 2.1446049}
+  };
+
+
+  CamiBase* camiPacoMarket = mapaBase->buscaCamiMesCurt(PacoJunior, DiaMarket);
+  std::cout << "Comment :=>> CALCUL CAMI MES CURT PER Paco Junior A Dia Market" << std::endl;
+  if (comprovaCamiMesCurt(expectedPacoJuniorToMarketCoordinates, camiPacoMarket->getCamiCoords())) {
+    grade += 5;
+  }
+
+  std::cout << "Comment :=>> CALCUL CAMI MES CURT PER Anec Pekin A Bar Castañeira" << std::endl;
+  CamiBase* camiAnecCastaneria = mapaBase->buscaCamiMesCurt(AnecPekin, Castaneria);
+  if (comprovaCamiMesCurt(expectedPekinToCasteneria, camiAnecCastaneria->getCamiCoords())) {
+    grade += 5;
+  }
+
+
+  return grade;
+}
+

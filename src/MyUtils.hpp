@@ -11,7 +11,7 @@ inline bool string_contains(const std::string& haystack, const std::string& need
     return haystack.find(needle) != std::string::npos;
 }
 
-std::vector<Coordinate> getNodeCoords(const EntryParser& parser, const binary_map<unsigned long, Coordinate>& pool) {
+inline std::vector<Coordinate> getNodeCoords(const EntryParser& parser, const binary_map<unsigned long, Coordinate>& pool) {
     const auto children = &parser.node.fills;
     std::vector<Coordinate> result;
 

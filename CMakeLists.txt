@@ -5,6 +5,7 @@ set(SOURCES
     src/Util.cpp
     src/XML4OSMUtilModificat.cpp
     src/PuntDeInteresBase.cpp
+    src/BallTree.cpp
 )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
