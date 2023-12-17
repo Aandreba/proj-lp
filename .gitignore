@@ -32,3 +32,9 @@ build/*
 *.exe
 *.out
 *.app
+
+# IntelliJ editors
+*.idea
+
+# CMake
+cmake-build-*/
