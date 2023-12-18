@@ -58,8 +58,11 @@ void construirArbreRec(BallTree* self, const std::vector<Coordinate>& coords) {
     }
 
     self->setEsquerre(new BallTree());
+    self->getEsquerre()->setArrel(self);
     construirArbreRec(self->getEsquerre(), left);
+
     self->setDreta(new BallTree());
+    self->getDreta()->setArrel(self);
     construirArbreRec(self->getDreta(), right);
 }
 
