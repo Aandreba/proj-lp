@@ -8,13 +8,13 @@ template <class K, class V>
 class binary_map {
    private:
     typedef std::vector<std::pair<K, V>> vector;
-    typedef typename vector::iterator iterator;
-    typedef typename vector::const_iterator const_iterator;
 
     vector inner;
 
    public:
     binary_map() : inner({}) {}
+    typedef typename vector::iterator iterator;
+    typedef typename vector::const_iterator const_iterator;
 
     /* Average Case: O(n) */
     std::pair<iterator, bool> insert(K key, V value) {
@@ -52,6 +52,13 @@ class binary_map {
     }
 
     /* UTILS */
+    inline V&
+
+        inline void
+        reserve(size_t capacity) {
+        return this->inner.reserve(capacity);
+    }
+
     inline void clear() noexcept {
         return this->inner.clear();
     }

@@ -1,11 +1,22 @@
 #pragma once
 
+#include <limits>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include "./binary_map.hpp"
 #include "./parser.hpp"
 #include "Common.h"
+
+static const double INF = std::numeric_limits<double>::infinity();
+static const double NEG_INF = -INF;
+
+template <class T>
+inline void swap_remove(std::vector<T>& source, size_t idx) {
+    std::swap(source.back(), source.at(idx));
+    source.pop_back();
+}
 
 inline bool string_contains(const std::string& haystack, const std::string& needle) {
     return haystack.find(needle) != std::string::npos;

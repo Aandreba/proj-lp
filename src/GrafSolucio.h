@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Common.h"
+#include "MyUtils.hpp"
 #include "Util.h"
 
 class GrafSolucio {
@@ -26,8 +27,6 @@ class GrafSolucio {
     }
 
    private:
-    static const double INF = std::numeric_limits<double>::infinity();
-
     std::vector<Coordinate> nodes;
     // rows --> source, cols --> destination
     std::vector<std::vector<double>> edges;
