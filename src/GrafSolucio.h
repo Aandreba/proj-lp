@@ -34,6 +34,12 @@ class GrafSolucio {
         row[dst] = Util::DistanciaHaversine(this->nodes.at(src), this->nodes.at(dst));
     }
 
+    // TODO
+    double distance(Coordinate from, Coordinate to) {
+        double dist = 0.0;
+        return dist;
+    }
+
    private:
     std::vector<Coordinate> nodes;
     // rows --> source, cols --> destination

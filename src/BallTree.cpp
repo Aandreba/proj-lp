@@ -6,6 +6,66 @@
 #include "MyUtils.hpp"
 #include "Util.h"
 
+bool fulla(BallTree* bola) {
+    if ((bola->getDreta() == nullptr) && (bola->getEsquerre() == nullptr) && (bola->getCoordenades().size() > 0))
+        return true;
+    else
+        return false;
+}
+
+Coordinate nodeMesProperRec(Coordinate pdi, Coordinate& Q, BallTree* bola) {
+    double distancia1 = 0.0, distancia2 = 0.0;
+    double min = 10000;
+    int index = 0;
+    std::vector<double> distancies;
+    std::vector<Coordinate> nodes;
+    Coordinate centre;
+    BallTree* esq;
+    BallTree* dret;
+
+    nodes = bola->getCoordenades();
+    centre = Util::calcularPuntCentral(nodes);
+    distancia1 = Util::DistanciaHaversine(centre, pdi);
+
+    for (int i = 0; i < nodes.size(); i++) {
+        distancies.push_back(Util::DistanciaHaversine(nodes[i], pdi));
+    }
+
+    for (int i = 0; i < distancies.size(); i++) {
+        if (distancies[i] < min) {
+            min = distancies[i];
+            index = i;
+        }
+    }
+
+    Q.lat = nodes[index].lat;
+    Q.lon = nodes[index].lon;
+
+    distancia2 = Util::DistanciaHaversine(centre, Q);
+
+    if ((distancia1 - bola->getRadi()) > distancia2) {
+        return Q;
+    }
+
+    if (fulla(bola) == true) {
+        return Q;
+    } else {
+        esq = bola->getEsquerre();
+        dret = bola->getDreta();
+
+        distancia1 = Util::DistanciaHaversine(esq->getPivot(), pdi);
+        distancia2 = Util::DistanciaHaversine(dret->getPivot(), pdi);
+
+        if (distancia2 < distancia1) {
+            nodeMesProperRec(pdi, Q, esq);
+        } else {
+            nodeMesProperRec(pdi, Q, dret);
+        }
+
+        return Q;
+    }
+}
+
 void construirArbreRec(BallTree* self, const std::vector<Coordinate>& coords) {
     const size_t size = coords.size();
     self->getCoordenades() = coords;
@@ -109,6 +169,55 @@ void BallTree::postOrdre(std::vector<std::list<Coordinate>>& out) {
     out.push_back(std::list<Coordinate>(this->getCoordenades().cbegin(), this->getCoordenades().cend()));
 }
 
-Coordinate BallTree::nodeMesProper(Coordinate targetQuery, Coordinate& Q, BallTree* ball) {
-    // TODO: TASCA 3
+Coordinate BallTree::nodeMesProper(Coordinate pdi, Coordinate& Q, BallTree* bola) {
+    double distancia1 = 0.0, distancia2 = 0.0;
+    double min = 10000;
+    int index = 0;
+    std::vector<double> distancies;
+    std::vector<Coordinate> nodes;
+    Coordinate centre;
+    BallTree* esq = new BallTree;
+    BallTree* dret = new BallTree;
+
+    nodes = bola->getCoordenades();
+    centre = Util::calcularPuntCentral(nodes);
+    distancia1 = Util::DistanciaHaversine(centre, pdi);
+
+    for (int i = 0; i < nodes.size(); i++) {
+        distancies.push_back(Util::DistanciaHaversine(nodes[i], pdi));
+    }
+
+    for (int i = 0; i < distancies.size(); i++) {
+        if (distancies[i] < min) {
+            min = distancies[i];
+            index = i;
+        }
+    }
+
+    Q.lat = nodes[index].lat;
+    Q.lon = nodes[index].lon;
+
+    distancia2 = Util::DistanciaHaversine(centre, Q);
+
+    if ((distancia1 - bola->getRadi()) > distancia2) {
+        return Q;
+    }
+
+    if (fulla(bola) == true) {
+        return Q;
+    } else {
+        esq = bola->getEsquerre();
+        dret = bola->getDreta();
+
+        distancia1 = Util::DistanciaHaversine(esq->getPivot(), pdi);
+        distancia2 = Util::DistanciaHaversine(dret->getPivot(), pdi);
+
+        if (distancia2 < distancia1) {
+            nodeMesProperRec(pdi, Q, esq);
+        } else {
+            nodeMesProperRec(pdi, Q, dret);
+        }
+
+        return Q;
+    }
 }

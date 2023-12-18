@@ -100,13 +100,19 @@ class MapaSolucio : public MapaBase {
 
             BallTree bt;
             bt.construirArbre(way->getCamiCoords());
+
             Coordinate start;
-            bt.nodeMesProper(desde->getCoord(), start, nullptr);
+            bt.nodeMesProper(desde->getCoord(), start, &bt);
             Coordinate end;
-            bt.nodeMesProper(a->getCoord(), end, nullptr);
+            bt.nodeMesProper(a->getCoord(), end, &bt);
 
             GrafSolucio graph(ways[i]);
-            break;
+            const double dist = graph.distance(start, end);
+
+            if (dist < min_dist) {
+                min_dist = dist;
+                min_way = way;
+            }
         }
 
         return min_way;
