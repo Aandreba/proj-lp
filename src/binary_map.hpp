@@ -52,10 +52,7 @@ class binary_map {
     }
 
     /* UTILS */
-    inline V&
-
-        inline void
-        reserve(size_t capacity) {
+    inline void reserve(size_t capacity) {
         return this->inner.reserve(capacity);
     }
 
