@@ -11,13 +11,18 @@ class SortedCoordinate {
     Coordinate coord;
     double dist;
 
-    inline bool operator<(const SortedCoordinate& other) const {
+    bool operator<(const SortedCoordinate& other) const {
         return dist < other.dist;
+    };
+
+    bool operator==(const SortedCoordinate& other) const {
+        return coord.lat == other.coord.lat && coord.lon == other.coord.lon;
     };
 };
 
-void construirArbreRec(BallTree* self, std::set<SortedCoordinate>::const_iterator start, std::set<SortedCoordinate>::const_iterator end) {
+void construirArbreRec(BallTree* self, std::vector<SortedCoordinate>::const_iterator start, std::vector<SortedCoordinate>::const_iterator end) {
     const size_t size = std::distance(start, end);
+
     for (auto coord = start; coord != end; coord++) {
         self->getCoordenades().push_back(coord->coord);
     }
@@ -32,11 +37,12 @@ void construirArbreRec(BallTree* self, std::set<SortedCoordinate>::const_iterato
     self->setPivot(Coordinate{mean.lat / (double)size, mean.lon / (double)size});
 
     // Calculate mean distance
-    std::set<SortedCoordinate> distances;
+    std::vector<SortedCoordinate> distances;
     for (auto coord = start; coord != end; coord++) {
         const double dist = Util::DistanciaHaversine(coord->coord, self->getPivot());
-        distances.insert(SortedCoordinate{coord->coord, dist});
+        distances.push_back(SortedCoordinate{coord->coord, dist});
     }
+    std::sort(distances.begin(), distances.end());
 
     // Split
     self->setRadius(std::next(distances.cend(), -1)->dist);
@@ -50,11 +56,13 @@ void construirArbreRec(BallTree* self, std::set<SortedCoordinate>::const_iterato
 }
 
 void BallTree::construirArbre(const std::vector<Coordinate>& coordenades) {
-    std::set<SortedCoordinate> coordinates;
+    std::vector<SortedCoordinate> coordinates;
 
     // Remove equal coordinates
     for (auto coord : coordenades) {
-        coordinates.insert(SortedCoordinate{coord, INF});
+        if (std::find(coordinates.begin(), coordinates.end(), SortedCoordinate{coord, INF}) == coordinates.end()) {
+            coordinates.push_back(SortedCoordinate{coord, INF});
+        }
     }
 
     construirArbreRec(this, coordinates.cbegin(), coordinates.cend());
