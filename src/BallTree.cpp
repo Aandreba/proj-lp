@@ -30,6 +30,7 @@ void construirArbreRec(BallTree* self, const std::vector<Coordinate>& coords) {
             max_dist = dist;
         }
     }
+    self->setRadius(max_dist);
 
     // Calculate distance from max
     Coordinate beta;
@@ -50,7 +51,7 @@ void construirArbreRec(BallTree* self, const std::vector<Coordinate>& coords) {
         const double d1 = Util::DistanciaHaversine(coord, alpha);
         const double d2 = Util::DistanciaHaversine(coord, beta);
 
-        if (d1 < d2)
+        if (d1 >= d2)
             left.push_back(coord);
         else
             right.push_back(coord);
@@ -69,12 +70,12 @@ void BallTree::construirArbre(const std::vector<Coordinate>& coordenades) {
 void BallTree::inOrdre(std::vector<std::list<Coordinate>>& out) {
     // TODO: TASCA 2
     const auto left = this->getEsquerre();
-    if (left != nullptr) left->preOrdre(out);
+    if (left != nullptr) left->inOrdre(out);
 
     out.push_back(std::list<Coordinate>(this->getCoordenades().cbegin(), this->getCoordenades().cend()));
 
     const auto right = this->getDreta();
-    if (right != nullptr) right->preOrdre(out);
+    if (right != nullptr) right->inOrdre(out);
 }
 
 void BallTree::preOrdre(std::vector<std::list<Coordinate>>& out) {
@@ -91,10 +92,10 @@ void BallTree::preOrdre(std::vector<std::list<Coordinate>>& out) {
 void BallTree::postOrdre(std::vector<std::list<Coordinate>>& out) {
     // TODO: TASCA 2
     const auto left = this->getEsquerre();
-    if (left != nullptr) left->preOrdre(out);
+    if (left != nullptr) left->postOrdre(out);
 
     const auto right = this->getDreta();
-    if (right != nullptr) right->preOrdre(out);
+    if (right != nullptr) right->postOrdre(out);
 
     out.push_back(std::list<Coordinate>(this->getCoordenades().cbegin(), this->getCoordenades().cend()));
 }
