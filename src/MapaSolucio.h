@@ -6,8 +6,10 @@
 
 #include "./MapaBase.h"
 #include "./Util.h"
+#include "BallTree.h"
 #include "Botiga.hpp"
 #include "Cami.hpp"
+#include "GrafSolucio.h"
 #include "MyUtils.hpp"
 #include "Restaurant.hpp"
 #include "binary_map.hpp"
@@ -89,5 +91,24 @@ class MapaSolucio : public MapaBase {
         this->ways.clear();
     }
 
-    CamiBase * buscaCamiMesCurt(PuntDeInteresBase *desde, PuntDeInteresBase *a) override { return nullptr; }
+    CamiBase* buscaCamiMesCurt(PuntDeInteresBase* desde, PuntDeInteresBase* a) {
+        CamiBase* min_way = nullptr;
+        double min_dist = INF;
+
+        for (size_t i = 0; i < ways.size(); i++) {
+            CamiBase* way = &ways[i];
+
+            BallTree bt;
+            bt.construirArbre(way->getCamiCoords());
+            Coordinate start;
+            bt.nodeMesProper(desde->getCoord(), start, nullptr);
+            Coordinate end;
+            bt.nodeMesProper(a->getCoord(), end, nullptr);
+
+            GrafSolucio graph(ways[i]);
+            break;
+        }
+
+        return min_way;
+    }
 };
