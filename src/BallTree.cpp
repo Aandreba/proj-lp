@@ -67,7 +67,13 @@ void construirArbreRec(BallTree* self, const std::vector<Coordinate>& coords) {
 }
 
 void BallTree::construirArbre(const std::vector<Coordinate>& coordenades) {
+    auto coords_clone = std::vector<Coordinate>(coordenades);
     construirArbreRec(this, coordenades);
+
+    this->setArrel(new BallTree());
+    this->getArrel()->setCoordenades(coords_clone);
+    this->getArrel()->setPivot(this->getPivot());
+    this->getArrel()->setRadius(this->getRadi());
 }
 
 void BallTree::inOrdre(std::vector<std::list<Coordinate>>& out) {
